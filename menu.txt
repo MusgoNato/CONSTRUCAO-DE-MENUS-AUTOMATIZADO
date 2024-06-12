@@ -1,0 +1,8 @@
+0 1 1 “Arquivo” A
+0 2 2 “Verificação” e
+1 3 1 “Opção 1 do Menu ‘Arquivo’” 1
+1 4 3 “Opção 3 do Menu ‘Arquivo’” 3
+1 5 2 “Opção 2 do Menu ‘Arquivo’” 2
+2 6 1 “Opção 1 do Menu ‘Verificação’” 1
+4 7 1 “SubsubOpcao 1”  1
+4 8 2 “SubsubOpcao 2” 2
