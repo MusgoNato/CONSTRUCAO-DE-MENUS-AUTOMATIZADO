@@ -22,9 +22,6 @@ main.exe*/
 /*Main principal do programa*/
 int main(int argc, char *argv[])
 {
-    /*Criado uma matriz que conterá o nome dos arquivos .txt*/
-    char *arquivos_na_matriz[50] = {"menu.txt", "config.txt"};
-
     /*Variavel do id retornado pelo submenu*/
     int id_retorno;
     
@@ -33,7 +30,8 @@ int main(int argc, char *argv[])
     argv = argv;
 
     /*Chamada da função Menu() para a criação dos menus*/
-    id_retorno = Menu(arquivos_na_matriz[0], arquivos_na_matriz[1]);
+
+    id_retorno = Menu("menu.txt", "config.txt");
 
     /*Impressão do id do menu retornado*/
     printf("%d", id_retorno);
