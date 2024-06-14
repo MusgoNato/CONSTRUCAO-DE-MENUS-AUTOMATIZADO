@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     argv = argv;
 
     setlocale(LC_ALL, " ");
-
+    
     /*Chamada da funcao Menu() para a criacao dos menus*/
     id_retorno = Menu("menu.txt", "config.txt");
 

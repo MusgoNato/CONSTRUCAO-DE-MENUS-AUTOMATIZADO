@@ -1,6 +1,7 @@
 /*Logica das funcoes utilizadas no decorrer do programa*/
 
 /*Inclusao de bibliotecas*/
+# include <ctype.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
@@ -26,6 +27,7 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
     char verifica_final_arquivo;
     char *verifica_final_linhas_arq;
     int conta_caracteres_no_arquivo = 0;
+    int i = 0;
 
     arquivos->conta_linhas_arquivo = 0;
 
@@ -53,9 +55,6 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
 
         /*Apos a leitura jogo o ponteiro para o arquivo no comeco do arquivo novamente*/
         fseek(retornos, 0, SEEK_SET);
-        
-        /*Aloca memoria para minha estrutura contendo os menus*/
-        menus = (MENU **)malloc(conta_caracteres_no_arquivo * sizeof(MENU *));
 
         /*Aloca memoria para minha matriz que contera meus arquivos*/
         arquivos->matriz_arquivo_menu = (char **)malloc(conta_caracteres_no_arquivo * sizeof(char *));
@@ -87,17 +86,33 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
                 /*Incremento da linha da stirng do arquivo*/
                 arquivos->conta_linhas_arquivo += 1;
             }
+
+            /*A alocaca do meu vetor de estruturas deve ser feita aqui, pois somente preciso das linhas para serem alocadas, mais nada*/
+            menus = (MENU **)malloc(arquivos->conta_linhas_arquivo * sizeof(MENU *));
+
+            /*Caso a alocacao der errada, libera a memoria alocada*/
+            if(menus == NULL)
+            {
+                free(menus);
+            }
+            else
+            {
+                /*Percorre a quantidade de linhas do arquivo armazenando nos ponteiros para minha estrutura*/
+                for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
+                {
+                    /*Aloca meus ponteiros para estruturas*/
+                    menus[i] = (MENU *)malloc(sizeof(MENU));
+                }
+
+                /*Chama a funcao para inicializar minha estrutura*/
+                Inicializa_estruturas_menus(menus, arquivos);
+
+            }
         }   
         else
         {
             /*Libera a memoria alocada para minha matriz*/
             free(arquivos->matriz_arquivo_menu);
-        }
-        
-        /*Verificacao se a estrutura foi alocada corretamente*/
-        if(menus == NULL)
-        {   
-            printf("Memoria nao alocada!");
         }
     }
     else
@@ -126,20 +141,9 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
 int Menu(char *arquivo_menus, char *arquivo_cores)
 {
     ARQUIVOS arquivos;
-    int i;
     
     /*Chamada da funcao para realizar a abertura e leitura dos arquivos*/
     Abre_arquivos_e_aloca_memoria(arquivo_menus, arquivo_cores, &arquivos);
-
-    /*Funcao para inicializar estrutura
-    Inicializa_estruturas_menus(menus, &arquivos);*/
-
-    /*Imprime na tela*/
-    for(i = 0; i < arquivos.conta_linhas_arquivo; i++)
-    {
-        printf("%s", arquivos.matriz_arquivo_menu[i]);
-    }
-    
 
     return 1;
 }
@@ -147,18 +151,54 @@ int Menu(char *arquivo_menus, char *arquivo_cores)
 /*Funcao para inicializar os campos dos meus menus, ids, ordem, etc*/
 void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos)
 {
-    int i;
+    int i, j;
     char caractere;
+    int tamanho = 0;
 
-    /*Inicializa os valores na estrutura para o id_pai*/
+    /*Esse loop mais externo percorre as linhas do meu arquivo menu.txt*/
     for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
     {
-        /*Pega o caractere da matriz que tem a copia do meu arquivo*/
-        caractere = arquivos->matriz_arquivo_menu[i][0];
+        /*Pega o tamanho de cada string na minha matriz contendo as linhas do arquivo*/
+        tamanho = strlen(arquivos->matriz_arquivo_menu[i]);
 
-        /*Converte em inteiro e armazena o id_pai*/
-        menus[i]->id_pai = caractere - '0';
+        /*Este loop percorre caractere por caractere da linha atual*/
+        for(j = 0; j < tamanho - 1; j++)
+        {
+            /*Pega o caractere correspondente ao campo relacionado da minha estrutura*/
+            /*Pega o id_pai*/
+            caractere = arquivos->matriz_arquivo_menu[i][j];
 
-        printf("%d", i);
+            /*Verifica o espaco em branco de cada paramentro dentro da minha matriz de linhas do arquivo*/
+            if(caractere != ' ')
+            {
+                /*Verifica se e um digito o caractere*/
+                if(isdigit(caractere))
+                {
+                    /*Se caso j for 0, esta no id_pai*/
+                    if(j == 0)
+                    {
+                        menus[i]->id_pai = caractere - '0';
+                    }
+
+                    /*Verifico o caractere anterior pra pegar o id unico do menu*/
+                    if(caractere != '0')
+                    {
+                        menus[i]->id = caractere - '0';
+                    }
+
+                    /*Pego a ordem do menu que sera apresentado, ja que a posicao nao muda, entao pego ele na posicao fixa do arquivo*/
+                    if(j == 4)
+                    {
+                        menus[i]->ordem = caractere - '0';
+                    }
+                }
+
+            }
+        }
+        /*ID NAO ESTA SENDO ATRIBUIDO CORRETAMENTE*/
+        /*Impressao de teste*/
+        printf("%d %d %d\n", menus[i]->id_pai, menus[i]->id, menus[i]->ordem);
+
+
     }
 }
