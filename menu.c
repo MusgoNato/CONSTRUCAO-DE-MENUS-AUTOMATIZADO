@@ -18,15 +18,16 @@ primeiro, a ordem determinara isso*/
 
 
 /*Funcao responsavel por ler os arquivos passados como parametros na funcao Menu()*/
-void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQUIVOS *arquivos, MENU *menus)
+void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQUIVOS *arquivos)
 {
     /*Ponteiro para um arquivo*/
     FILE *retornos;
+    MENU **menus;
     char verifica_final_arquivo;
     char *verifica_final_linhas_arq;
     int conta_caracteres_no_arquivo = 0;
-    int indice_matrizes = 0;
-    int i;
+
+    arquivos->conta_linhas_arquivo = 0;
 
     /*Verificacao da abertura dos arquivos iniciais*/   
     retornos = fopen(arquivo_menus, "r");
@@ -54,7 +55,7 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
         fseek(retornos, 0, SEEK_SET);
         
         /*Aloca memoria para minha estrutura contendo os menus*/
-        menus = (MENU *)malloc(conta_caracteres_no_arquivo * sizeof(MENU));
+        menus = (MENU **)malloc(conta_caracteres_no_arquivo * sizeof(MENU *));
 
         /*Aloca memoria para minha matriz que contera meus arquivos*/
         arquivos->matriz_arquivo_menu = (char **)malloc(conta_caracteres_no_arquivo * sizeof(char *));
@@ -65,11 +66,11 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
             /*Loop para pegar cada linha do meu arquivo*/
             while(1)
             {
-                arquivos->matriz_arquivo_menu[indice_matrizes] = (char *)malloc(TAM_BUFFER * sizeof(char));
-                if(arquivos->matriz_arquivo_menu[indice_matrizes] != NULL)
+                arquivos->matriz_arquivo_menu[arquivos->conta_linhas_arquivo] = (char *)malloc(TAM_BUFFER * sizeof(char));
+                if(arquivos->matriz_arquivo_menu[arquivos->conta_linhas_arquivo] != NULL)
                 {
                     /*Armazena cada linha do meu arquivo aberto na minha matriz*/
-                    verifica_final_linhas_arq = fgets(arquivos->matriz_arquivo_menu[indice_matrizes], TAM_BUFFER, retornos);
+                    verifica_final_linhas_arq = fgets(arquivos->matriz_arquivo_menu[arquivos->conta_linhas_arquivo], TAM_BUFFER, retornos);
 
                     /*Saida caso a alocacao der errado*/
                     if(verifica_final_linhas_arq == NULL)
@@ -84,7 +85,7 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
                 }
 
                 /*Incremento da linha da stirng do arquivo*/
-                indice_matrizes += 1;
+                arquivos->conta_linhas_arquivo += 1;
             }
         }   
         else
@@ -107,11 +108,6 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
     /*Fecha o arquivo menu.txt*/
     fclose(retornos);
 
-    for(i = 0; i < indice_matrizes; i++)
-    {
-        printf("%s", arquivos->matriz_arquivo_menu[i]);
-    }
-
     retornos = fopen(arquivo_cores, "r");
     if(retornos != NULL)
     {
@@ -129,16 +125,40 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
 /*Funcao resonsavel por automatizar a criacao de menus*/
 int Menu(char *arquivo_menus, char *arquivo_cores)
 {
-    MENU menus;
     ARQUIVOS arquivos;
-
-    /*Chamada da funcao para realizar a abertura e leitura dos arquivos*/
-    Abre_arquivos_e_aloca_memoria(arquivo_menus, arquivo_cores, &arquivos, &menus);
-
-    /*Funcao para inicializar estrutura*/
-    Inicializa_estrutura(&menus);
+    int i;
     
+    /*Chamada da funcao para realizar a abertura e leitura dos arquivos*/
+    Abre_arquivos_e_aloca_memoria(arquivo_menus, arquivo_cores, &arquivos);
+
+    /*Funcao para inicializar estrutura
+    Inicializa_estruturas_menus(menus, &arquivos);*/
+
+    /*Imprime na tela*/
+    for(i = 0; i < arquivos.conta_linhas_arquivo; i++)
+    {
+        printf("%s", arquivos.matriz_arquivo_menu[i]);
+    }
+    
+
     return 1;
 }
 
-/**/
+/*Funcao para inicializar os campos dos meus menus, ids, ordem, etc*/
+void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos)
+{
+    int i;
+    char caractere;
+
+    /*Inicializa os valores na estrutura para o id_pai*/
+    for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
+    {
+        /*Pega o caractere da matriz que tem a copia do meu arquivo*/
+        caractere = arquivos->matriz_arquivo_menu[i][0];
+
+        /*Converte em inteiro e armazena o id_pai*/
+        menus[i]->id_pai = caractere - '0';
+
+        printf("%d", i);
+    }
+}
