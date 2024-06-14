@@ -1,20 +1,21 @@
-/*Programa: Construção de Menus
-Descrição: Programa será capaz de construir menus com base em 2 arquivos .txt, 1° armazena a quantidade de menus e submenus que o programa criará
-e o 2° as cores dos respectivos menus e submenus, cores de texto e fundo. O usuario poderá navegar nesses menus com as setas de direção e tambem poderá
+/*Programa: Construcao de Menus
+Descri��o: Programa sera capaz de construir menus com base em 2 arquivos .txt, 1� armazena a quantidade de menus e submenus que o programa criara
+e o 2� as cores dos respectivos menus e submenus, cores de texto e fundo. O usuario podera navegar nesses menus com as setas de direcao e tambem podera
 escolher qualquer um por meio da tecla ENTER.
 
-Programador: Hugo Josué Lema Das Neves
+Programador: Hugo Josue Lema Das Neves
 RGM: 47159 
-Data da última modificação: 12/06/2024*/
+Data da Ultima modificacao: 12/06/2024*/
 
 /*Copiar e colar no prompt de comando, apertar ENTER para executar
 gcc main.c -o main.exe console_v1.5.5.c conio_v3.2.4.c menu.c -Wall -pedantic -Wextra -Werror
 */
 
-/*Executavel gerado após a linha de compilação acima, copie, cole no terminal do cmd e execute apertando ENTER
+/*Executavel gerado apos a linha de compilacao acima, copie, cole no terminal do cmd e execute apertando ENTER
 main.exe*/
 
 # include <stdio.h>
+# include <locale.h>
 # include "conio_v3.2.4.h"
 # include "console_v1.5.5.h"
 # include "funcoes.h"
@@ -29,11 +30,12 @@ int main(int argc, char *argv[])
     argc = argc;
     argv = argv;
 
-    /*Chamada da função Menu() para a criação dos menus*/
+    setlocale(LC_ALL, " ");
 
+    /*Chamada da funcao Menu() para a criacao dos menus*/
     id_retorno = Menu("menu.txt", "config.txt");
 
-    /*Impressão do id do menu retornado*/
+    /*Impressao do id do menu retornado*/
     printf("%d", id_retorno);
 
     return 0;

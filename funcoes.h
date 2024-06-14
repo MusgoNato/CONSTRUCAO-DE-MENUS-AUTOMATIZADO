@@ -1,15 +1,16 @@
-/*Protótipos de funções e declarações de constantes*/
+/*Prototipos de funcoes e declaracoes de constantes*/
 
 # include <stdio.h>
 
 
 /*Constantes*/
 # define TAM_OPCAO_MENU 30 
+# define TAM_BUFFER 60
 
-/*Declaração de estruturas*/
+/*Declaracao de estruturas*/
 typedef struct menus_programa
 {
-    /*Quem será o pai do menu a ser criado*/
+    /*Quem sera o pai do menu a ser criado*/
     int id_pai;
 
     /*O id do proprio menu*/
@@ -25,9 +26,22 @@ typedef struct menus_programa
     char letra_atalho;
 }MENU;
 
-/*Função responsável por ler os arquivos passados para realizar a verificação se foram abertos e lidos de modo correto*/
-void Abre_arquivos_e_aloca_memoria(char *, char *);
+typedef struct arquivos
+{
+    /*Contem meus arquivos em matrizes*/
+    char **matriz_arquivo_menu;
+    char *vetor_arquivo_cores;
 
-/*Função responsável por criar meus menus de acordo com os arquivos passados como argumento*/
+}ARQUIVOS;
+
+
+
+/*Funcao responsavel por ler os arquivos passados para realizar a verificacao se foram abertos e lidos de modo correto*/
+void Abre_arquivos_e_aloca_memoria(char *, char *, ARQUIVOS *, MENU *);
+
+/*Funcao responsavel por criar meus menus de acordo com os arquivos passados como argumento*/
 int Menu(char *, char *);
+
+/*Funcao para inicializar estrutura contendo os menus*/
+void Inicializa_estrutura(ARQUIVOS *);
 
