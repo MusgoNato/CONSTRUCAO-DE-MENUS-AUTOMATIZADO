@@ -93,6 +93,7 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
             /*Caso a alocacao der errada, libera a memoria alocada*/
             if(menus == NULL)
             {
+                /*Libera memoria da estrutura*/
                 free(menus);
             }
             else
@@ -124,13 +125,9 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
     fclose(retornos);
 
     retornos = fopen(arquivo_cores, "r");
-    if(retornos != NULL)
+    if(retornos == NULL)
     {
-        printf("Deu certo 2!\n");
-    }
-    else
-    {
-        printf("Erro na abertura do arquivo 'config.txt'!\n");
+        printf("Erro ao alocar memoria a arquivo config.txt!");
     }
 
     /*Fecha o arquivo config.txt*/
@@ -151,7 +148,7 @@ int Menu(char *arquivo_menus, char *arquivo_cores)
 /*Funcao para inicializar os campos dos meus menus, ids, ordem, etc*/
 void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos)
 {
-    int i, j;
+    int i, j/*, index_string = 0*/;
     char caractere;
     int tamanho = 0;
 
@@ -164,13 +161,35 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos)
         /*Este loop percorre caractere por caractere da linha atual*/
         for(j = 0; j < tamanho - 1; j++)
         {
-            /*Pega o caractere correspondente ao campo relacionado da minha estrutura*/
-            /*Pega o id_pai*/
+            /*Pega o caractere dentro da minha matriz contendo o arquivo*/
             caractere = arquivos->matriz_arquivo_menu[i][j];
 
             /*Verifica o espaco em branco de cada paramentro dentro da minha matriz de linhas do arquivo*/
             if(caractere != ' ')
             {
+                /*ARRUMAR A ALOCACAO DE STRING DO ARQUIVO PARA A ESTRUTURA*/
+                /*Quando o caractere for uma aspas duplas, significa que ela sera a string referente a minha opcao no menu
+                if(caractere == '"')
+                {
+                    while(1)
+                    {
+                        Incrementa de comeco para nao pegar a propria aspas duplas, pois esta na posicao dela antes do incremento
+                        j++;
+
+                        Coloco cada caractere dentro da minha string da estrutura menus
+                        menus[i]->nome_menu[index_string] = arquivos->matriz_arquivo_menu[i][j];
+
+                        Verifica o fim da minha string
+                        if(menus[i]->nome_menu[index_string] == '\0')
+                        {
+                            break;
+                        }
+
+                        Incrementa o contador da minha string
+                        index_string++;
+                    }
+
+                }*/
                 /*Verifica se e um digito o caractere*/
                 if(isdigit(caractere))
                 {
@@ -181,7 +200,7 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos)
                     }
 
                     /*Verifico o caractere anterior pra pegar o id unico do menu*/
-                    if(caractere != '0')
+                    if(j == 2)
                     {
                         menus[i]->id = caractere - '0';
                     }
@@ -195,10 +214,9 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos)
 
             }
         }
-        /*ID NAO ESTA SENDO ATRIBUIDO CORRETAMENTE*/
-        /*Impressao de teste*/
-        printf("%d %d %d\n", menus[i]->id_pai, menus[i]->id, menus[i]->ordem);
-
-
+        
+        /*Impressao de teste
+        printf("%d %d %d ", menus[i]->id_pai, menus[i]->id, menus[i]->ordem);
+        printf("%s\n", menus[i]->nome_menu);*/
     }
 }
