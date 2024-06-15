@@ -34,9 +34,9 @@ int main(int argc, char *argv[])
     
     /*Chamada da funcao Menu() para a criacao dos menus*/
     id_retorno = Menu("menu.txt", "config.txt");
-
+    
     /*Impressao do id do menu retornado*/
-    printf("%d", id_retorno);
+    printf("retorno main: %d", id_retorno);
 
     return 0;
 }

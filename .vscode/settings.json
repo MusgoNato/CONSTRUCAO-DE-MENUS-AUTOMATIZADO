@@ -2,6 +2,8 @@
     "files.associations": {
         "conio_v3.2.4.h": "c",
         "funcoes.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "locale.h": "c",
+        "stdio.h": "c"
     }
 }
