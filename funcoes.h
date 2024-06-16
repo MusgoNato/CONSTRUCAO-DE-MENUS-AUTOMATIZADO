@@ -7,6 +7,7 @@
 # define TAM_OPCAO_MENU 35
 # define TAM_BUFFER 60
 # define TAM_LINHA_CONFIG 100
+# define TAM_VETOR_MENU_CONFIG 20 
 
 /*Declaracao de estruturas*/
 typedef struct menus_programa
@@ -41,10 +42,10 @@ typedef struct config
     /*Representa a cor de fundo da barra do menu principal*/
     int cor1;
 
-    /*Representa a cor das opcoes quando nao estao selecionadas*/
+    /*Representa a cor das opcoes do menu principal quando nao estao selecionadas*/
     int cor2;
 
-    /*Representa a cor das opcoes selecionadas*/
+    /*Representa a cor das opcoes menu principal selecionadas*/
     int cor3;
 
     /*Representa a cor do fundo das opcoes do menu principal quando estao selecionadas*/
@@ -68,8 +69,11 @@ typedef struct config
     /*Representa a cor de fundo do submenu quando estao selecionadas*/
     int cor10;
 
-    /*Representa a cor da letra de atalho das opcoes dos submenus*/
+    /*Representa a cor da letra de atalho das opcoes dos submenus quando nao estao selecionadas*/
     int cor11;
+
+    /*Representa a cor da letra de atalho dos subemnus quando estao selecionadas*/
+    int cor12;
 
     /*Representa a cor de fundo da janela principal*/
     int cor13;
@@ -103,5 +107,5 @@ void Abre_arquivos_e_aloca_memoria(char *, char *, ARQUIVOS *);
 int Menu(char *, char *);
 
 /*Funcao para inicializar estrutura contendo os menus*/
-void Inicializa_estruturas_menus(MENU **, ARQUIVOS *);
+void Inicializa_estruturas_menus(MENU **, ARQUIVOS *,  MENU_CONFIG *);
 

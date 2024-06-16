@@ -24,6 +24,7 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
     /*Ponteiro para um arquivo*/
     FILE *arq_menus, *arq_config;
     MENU **menus;
+    MENU_CONFIG menu_config;
     char caractere;
     int index_congiftxt = 0;
     char verifica_final_arquivo;
@@ -159,7 +160,7 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
     /*Se caso os dois arquivos, seus retornos sao diferente de NULL, significa que foram abertos corretamente*/
     if(arq_config != NULL && arq_menus != NULL)
     {
-        Inicializa_estruturas_menus(menus, arquivos);
+        Inicializa_estruturas_menus(menus, arquivos, &menu_config);
     }
     
 }
@@ -176,13 +177,12 @@ int Menu(char *arquivo_menus, char *arquivo_cores)
 }
 
 /*Funcao para inicializar os campos dos meus menus, ids, ordem, etc*/
-void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos)
+void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *menu_config)
 {
     int i, j, index_string = 0;
     char caractere;
-    /*char caractere_configtxt;
-    int tam_configtxt = 0;*/
     int tamanho = 0;
+
 
     /*Esse loop mais externo percorre as linhas do meu arquivo menu.txt*/
     for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
@@ -259,14 +259,13 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos)
             }
         }
     }
+    
+    /*O sscanf le dados de uma string passada como primeiro parametro, como sao inteiros dentro de uma estrutura, somente e necessario passar a quantidade de inteiros
+    que serao lidos no segundo parametro da funcao, assim eu tenho o valor armazenado em cada inteiro da estrutura menu_config.
+    Como consegue delimitar o espaco presente dentro da string e converter o numero em inteiro, essa forma foi mais facil de atribuir os valores a estrutura*/
+    sscanf(arquivos->vetor_arquivo_cores, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", &menu_config->cor1, &menu_config->cor2, &menu_config->cor3, &menu_config->cor4,
+    &menu_config->cor5, &menu_config->cor6, &menu_config->cor7, &menu_config->cor8, &menu_config->cor9, &menu_config->cor10, &menu_config->cor11, &menu_config->cor12, &menu_config->cor13,
+    &menu_config->cor14, &menu_config->cor15, &menu_config->cor16, &menu_config->largura, &menu_config->altura, &menu_config->espacamento);
 
-    /*Apos inicializar a estrutura dos menus, faco a inicializacao da estrutura contendo o outro arquivo
-    for(i = 0; i < tam_configtxt; i++)
-    {
-        caractere_configtxt = arquivos->vetor_arquivo_cores[i];
-        if(caractere_configtxt >= '0' && caractere <= '9')
-        {
-            menus_config.
-        }
-    }   */
+
 }
