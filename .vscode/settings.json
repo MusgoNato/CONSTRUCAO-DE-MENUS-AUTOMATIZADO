@@ -4,6 +4,7 @@
         "funcoes.h": "c",
         "string.h": "c",
         "locale.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "console_v1.5.5.h": "c"
     }
 }

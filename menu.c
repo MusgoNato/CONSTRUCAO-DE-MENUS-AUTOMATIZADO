@@ -161,9 +161,38 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
     if(arq_config != NULL && arq_menus != NULL)
     {
         Inicializa_estruturas_menus(menus, arquivos, &menu_config);
+        /*Exibe_menu_principal(menus, &menu_config, arquivos);*/
     }
-    
+
 }
+
+/*Funcao que exibe o menu
+void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos)
+{
+    int i;
+    int tamanho = 0;
+
+    A coordenada para impressao e setada pra 1, onde sera impresso meu menu principal
+    menu_config->posicao_menu_principal.X = 1;
+    menu_config->posicao_menu_principal.Y = 1; 
+
+    Imprime meu menu na horizontal
+    for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
+    {
+        Verifico se e um menu principal, que sera impresso na horizontal
+        if(menus[i]->id_pai == 0)
+        {
+            Seto a impressao e imprimo o menu
+            gotoxy(menu_config->posicao_menu_principal.X + tamanho, menu_config->posicao_menu_principal.Y);
+            textbackground(menu_config->cor1);
+            printf("%s", menus[i]->nome_menu);
+
+            Faco o tamanho receber o tamanho da opcao mais o espacamento que tem na variavel da estrutura de configuracoes do menu
+            tamanho = strlen(menus[i]->nome_menu) + menu_config->espacamento;
+        }
+        
+    }
+}*/
 
 /*Funcao resonsavel por automatizar a criacao de menus*/
 int Menu(char *arquivo_menus, char *arquivo_cores)
@@ -173,6 +202,9 @@ int Menu(char *arquivo_menus, char *arquivo_cores)
     /*Chamada da funcao para realizar a abertura e leitura dos arquivos*/
     Abre_arquivos_e_aloca_memoria(arquivo_menus, arquivo_cores, &arquivos);
 
+    /*seta as cores originais do cmd*/
+    textcolor(LIGHTGRAY);
+    textbackground(BLACK);
     return 1;
 }
 
@@ -227,8 +259,9 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
 
                 }
                 
-                /*Caso chegue ao final da linha, basta somente pegar a letra de atalho, eh o que essa verificacao faz*/
-                if(j == tamanho - 1)        
+                /*Como a alocacao pega o \n e tem o \0 tambem, faco essa verificacao para pegar a letra de atalho, quando chega na ultima linha
+                entao nao e necessario pegar o -2, pois nao ha \n e sim o \0. Eh o que a outra parte da verificacao compara (j == tamanho - 1)*/
+                if((j == tamanho - 2 && caractere != '\n') || j == tamanho - 1)        
                 {
                     /*Atribui a tecla de atalho na estrutura menus*/
                     menus[i]->letra_atalho = caractere;
