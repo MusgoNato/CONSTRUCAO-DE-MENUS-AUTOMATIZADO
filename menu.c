@@ -7,14 +7,14 @@
 # include <string.h>
 # include "funcoes.h"
 
-/*LembranÃ§a
-Id pai Ã© o identificador se Ã© um menu ou submenu, caso seja 0 Ã© menu e deve ser impresso na posiÃ§Ã£o horizontal, caso seja 1 Ã© um submenu
-e deve ser impresso em posiÃ§Ã£o vertical*/
+/*Lembran‡a
+Id pai ‚ o identificador se ‚ um menu ou submenu, caso seja 0 ‚ menu e deve ser impresso na posi‡Æo horizontal, caso seja 1 ‚ um submenu
+e deve ser impresso em posi‡Æo vertical*/
 
-/*Id, cada menu tem seu id, quando um submenu Ã© criado, o id_pai dele vai estar vinculado ao id de algum menu que veio antes dele, pois tem que ter
+/*Id, cada menu tem seu id, quando um submenu ‚ criado, o id_pai dele vai estar vinculado ao id de algum menu que veio antes dele, pois tem que ter
 essa ligacao, para saber de qual menu veio o submenu criado*/
 
-/*A ordem refere-se a ordem que os elementos vÃ£o ser colocados na tela, caso haja 2 ids_pais com valor 0, ha dois menu principal, algum deles vai ser impresso
+/*A ordem refere-se a ordem que os elementos vÆo ser colocados na tela, caso haja 2 ids_pais com valor 0, ha dois menu principal, algum deles vai ser impresso
 primeiro, a ordem determinara isso*/
 
 
@@ -161,51 +161,49 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
     if(arq_config != NULL && arq_menus != NULL)
     {
         Inicializa_estruturas_menus(menus, arquivos, &menu_config);
-        /*Exibe_menu_principal(menus, &menu_config, arquivos);*/
     }
 
 }
-
-/*Funcao que exibe o menu
-void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos)
-{
-    int i;
-    int tamanho = 0;
-
-    A coordenada para impressao e setada pra 1, onde sera impresso meu menu principal
-    menu_config->posicao_menu_principal.X = 1;
-    menu_config->posicao_menu_principal.Y = 1; 
-
-    Imprime meu menu na horizontal
-    for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
-    {
-        Verifico se e um menu principal, que sera impresso na horizontal
-        if(menus[i]->id_pai == 0)
-        {
-            Seto a impressao e imprimo o menu
-            gotoxy(menu_config->posicao_menu_principal.X + tamanho, menu_config->posicao_menu_principal.Y);
-            textbackground(menu_config->cor1);
-            printf("%s", menus[i]->nome_menu);
-
-            Faco o tamanho receber o tamanho da opcao mais o espacamento que tem na variavel da estrutura de configuracoes do menu
-            tamanho = strlen(menus[i]->nome_menu) + menu_config->espacamento;
-        }
-        
-    }
-}*/
 
 /*Funcao resonsavel por automatizar a criacao de menus*/
 int Menu(char *arquivo_menus, char *arquivo_cores)
 {
     ARQUIVOS arquivos;
-    
+
+    setCursorStatus(DESLIGAR);
+
     /*Chamada da funcao para realizar a abertura e leitura dos arquivos*/
     Abre_arquivos_e_aloca_memoria(arquivo_menus, arquivo_cores, &arquivos);
 
     /*seta as cores originais do cmd*/
     textcolor(LIGHTGRAY);
     textbackground(BLACK);
+
     return 1;
+}
+
+/*Inicializa a estrutura contendo as configuracoes do menu*/
+void Inicializa_estrutura_cores(MENU_CONFIG *menu_config, int vetor_aux[])
+{
+    menu_config->cor1 = vetor_aux[0];
+    menu_config->cor2 = vetor_aux[1];
+    menu_config->cor3 = vetor_aux[2];
+    menu_config->cor4 = vetor_aux[3];
+    menu_config->cor5 = vetor_aux[4];
+    menu_config->cor6 = vetor_aux[5];
+    menu_config->cor7 = vetor_aux[6];
+    menu_config->cor8 = vetor_aux[7];
+    menu_config->cor9 = vetor_aux[8];
+    menu_config->cor10 = vetor_aux[9];
+    menu_config->cor11 = vetor_aux[10];
+    menu_config->cor12 = vetor_aux[11];
+    menu_config->cor13 = vetor_aux[12];
+    menu_config->cor14 = vetor_aux[13];
+    menu_config->cor15 = vetor_aux[14];
+    menu_config->cor16 = vetor_aux[15];
+    menu_config->largura = vetor_aux[16];
+    menu_config->altura = vetor_aux[17];
+    menu_config->espacamento = vetor_aux[18];
 }
 
 /*Funcao para inicializar os campos dos meus menus, ids, ordem, etc*/
@@ -213,9 +211,12 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
 {
     int i, j, index_string = 0;
     char caractere;
+    char *delimitador;
     int tamanho = 0;
+    int index_aux = 0;
+    int vetor_aux[TAM_VETOR_AUX_TOKENIZACAO];
 
-
+    menu_config = menu_config;
     /*Esse loop mais externo percorre as linhas do meu arquivo menu.txt*/
     for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
     {
@@ -292,13 +293,90 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
             }
         }
     }
+
+    /*Tokenizo a string de acordo com os espacos*/
+    delimitador = strtok(arquivos->vetor_arquivo_cores, " ");
+
+    /*Loop para pegar cada caractere e transformar em inteiro para meu vetor auxiliar*/
+    while(delimitador)
+    {
+        /*A cada indice do meu vetor faco a atribuicao em inteiro no meu vetor de inteiros, usando a funcao atoi()*/
+        vetor_aux[index_aux] = atoi(delimitador);
+
+        /*Tokenizo novamento a string, porem apartir da ultima tokenizacao feita, pois ha a atribuicao do \0 ao final de cada tokenizacao da string original*/
+        delimitador = strtok(NULL, " ");        
+        index_aux++;
+    }
+
+    /*Chamo a funcao para inicializar a estrutura contendo as variaveis para as cores do menu e suas configuracoes*/
+    Inicializa_estrutura_cores(menu_config, vetor_aux);
+
+    /*Depois da alocacao e inicializacao das estruturas, chamo a funcao para exibir o menu*/
+    Exibe_menu_principal(menus, menu_config, arquivos);
+}
+
+
+/*Funcao que exibe meu menu*/
+void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos)
+{
+    int i, j;
+    int tamanho = 0;
+
+    /*A coordenada para impressao e setada pra 1, onde sera impresso meu menu principal*/
+    menu_config->posicao_menu_principal.X = 1;
+    menu_config->posicao_menu_principal.Y = 1; 
+
+    /*Imprime meu menu na horizontal*/
+    for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
+    {
+        /*Verifico se e um menu principal, que sera impresso na horizontal*/
+        if(menus[i]->id_pai == 0)
+        {
+            /*Seto a impressao e imprimo o menu*/
+            gotoxy(menu_config->posicao_menu_principal.X + tamanho, menu_config->posicao_menu_principal.Y);
+            textbackground(menu_config->cor1);
+            printf("%s", menus[i]->nome_menu);
+
+            /*Faco o tamanho receber o tamanho da opcao mais o espacamento que tem na variavel da estrutura de configuracoes do menu*/
+            tamanho = strlen(menus[i]->nome_menu) + menu_config->espacamento;
+        }
+        else
+        {
+            for(j = 0; j < arquivos->conta_linhas_arquivo; j++)
+            {
+                /*Verifico os submenus*/
+                if(menus[i]->id_pai == menus[j]->id)
+                {
+                    gotoxy(menu_config->posicao_menu_principal.X, menu_config->posicao_menu_principal.Y + i);
+                    printf("%s", menus[i]->nome_menu);
+                }
+            }
+            
+        }
+        
+    }
+
+    /*Verifica-se se e uma acao do teclado*/
+    if(hit(KEYBOARD_HIT))
+    {
+        /*Pego o evento*/
+        arquivos->teclas_evento = Evento();
+
+        /*Caso seja do teclado*/
+        if(arquivos->teclas_evento.tipo_evento & KEY_EVENT)
+        {
+            /*Verifico a liberacao da tecla pressionada*/
+            if(arquivos->teclas_evento.teclado.status_tecla == LIBERADA)
+            {
+                /*Verifico o codigo da tecla*/
+                if(arquivos->teclas_evento.teclado.key_code == ESC)
+                {
+                    /*Ativa o cursor novamente*/
+                    setCursorStatus(LIGAR);
+                    exit(0);
+                }
+            }
+        }
+    }
     
-    /*O sscanf le dados de uma string passada como primeiro parametro, como sao inteiros dentro de uma estrutura, somente e necessario passar a quantidade de inteiros
-    que serao lidos no segundo parametro da funcao, assim eu tenho o valor armazenado em cada inteiro da estrutura menu_config.
-    Como consegue delimitar o espaco presente dentro da string e converter o numero em inteiro, essa forma foi mais facil de atribuir os valores a estrutura*/
-    sscanf(arquivos->vetor_arquivo_cores, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", &menu_config->cor1, &menu_config->cor2, &menu_config->cor3, &menu_config->cor4,
-    &menu_config->cor5, &menu_config->cor6, &menu_config->cor7, &menu_config->cor8, &menu_config->cor9, &menu_config->cor10, &menu_config->cor11, &menu_config->cor12, &menu_config->cor13,
-    &menu_config->cor14, &menu_config->cor15, &menu_config->cor16, &menu_config->largura, &menu_config->altura, &menu_config->espacamento);
-
-
 }

@@ -31,9 +31,11 @@ int main(int argc, char *argv[])
     argv = argv;
 
     setlocale(LC_ALL, " ");
-    
-    /*Chamada da funcao Menu() para a criacao dos menus*/
-    id_retorno = Menu("menu.txt", "config.txt");
+    do
+    {   
+        /*Chamada da funcao Menu() para a criacao dos menus*/
+        id_retorno = Menu("menu.txt", "config.txt");
+    }while(1);
 
     printf("Main : %d", id_retorno);
     return 0;

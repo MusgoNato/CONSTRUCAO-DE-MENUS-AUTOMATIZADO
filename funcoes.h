@@ -9,6 +9,7 @@
 # define TAM_BUFFER 100
 # define TAM_LINHA_CONFIG 100
 # define TAM_VETOR_MENU_CONFIG 20 
+# define TAM_VETOR_AUX_TOKENIZACAO 19
 
 /*Declaracao de estruturas*/
 typedef struct menus_programa
@@ -35,6 +36,7 @@ typedef struct arquivos
     char **matriz_arquivo_menu;
     char vetor_arquivo_cores[TAM_LINHA_CONFIG];
     int conta_linhas_arquivo;
+    EVENTO teclas_evento;
 
 }ARQUIVOS;
 
@@ -103,14 +105,15 @@ typedef struct config
 }MENU_CONFIG;
 
 
-
 /*Funcao responsavel por ler os arquivos passados para realizar a verificacao se foram abertos e lidos de modo correto*/
 void Abre_arquivos_e_aloca_memoria(char *, char *, ARQUIVOS *);
 
-/*void Exibe_menu_principal(MENU **, MENU_CONFIG *, ARQUIVOS *);*/
+void Exibe_menu_principal(MENU **, MENU_CONFIG *, ARQUIVOS *);
 
 /*Funcao responsavel por criar meus menus de acordo com os arquivos passados como argumento*/
 int Menu(char *, char *);
+
+void Inicializa_estrutura_cores(MENU_CONFIG *, int []);
 
 /*Funcao para inicializar estrutura contendo os menus*/
 void Inicializa_estruturas_menus(MENU **, ARQUIVOS *,  MENU_CONFIG *);
