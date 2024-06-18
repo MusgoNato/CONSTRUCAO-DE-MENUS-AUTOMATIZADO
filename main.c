@@ -15,6 +15,7 @@ gcc main.c -o main.exe console_v1.5.5.c conio_v3.2.4.c menu.c -Wall -pedantic -W
 main.exe*/
 
 # include <stdio.h>
+# include <stdlib.h>
 # include <locale.h>
 # include "conio_v3.2.4.h"
 # include "console_v1.5.5.h"
@@ -31,12 +32,13 @@ int main(int argc, char *argv[])
     argv = argv;
 
     setlocale(LC_ALL, " ");
-    do
-    {   
-        /*Chamada da funcao Menu() para a criacao dos menus*/
-        id_retorno = Menu("menu.txt", "config.txt");
-    }while(1);
 
+    clrscr();
+ 
+    /*Chamada da funcao Menu() para a criacao dos menus*/
+    id_retorno = Menu("menu.txt", "config.txt");
     printf("Main : %d", id_retorno);
+
+    
     return 0;
 }

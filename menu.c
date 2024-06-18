@@ -25,13 +25,14 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
     FILE *arq_menus, *arq_config;
     MENU **menus;
     MENU_CONFIG menu_config;
+    int pega_tamanho_linha = 0;
     char caractere;
     int index_congiftxt = 0;
     char verifica_final_arquivo;
     char *verifica_final_linhas_arq;
     int conta_caracteres_no_arquivo = 0;
     int i = 0;
-
+    menu_config = menu_config;
     arquivos->conta_linhas_arquivo = 0;
 
     /*Verificacao da abertura dos arquivos iniciais*/   
@@ -80,14 +81,35 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
                         fclose(arq_menus);
                         break;
                     }
+
+                    /*Verifico o primeiro caractere, caso seja \n, libero a memoria da alocacao da linha, caso nao for */
+                    if(arquivos->matriz_arquivo_menu[arquivos->conta_linhas_arquivo][0] == '\n')
+                    {
+                        /*Libero a memoria alocada para a string*/
+                        free(arquivos->matriz_arquivo_menu[arquivos->conta_linhas_arquivo]);
+                    }
+                    else
+                    {
+                        /*Pego o tamanho de cada linha*/
+                        pega_tamanho_linha = strlen(arquivos->matriz_arquivo_menu[arquivos->conta_linhas_arquivo]);
+
+                        /*Verifico se a string tem um \n, caso tenho retiro colocando um \0 no lugar*/
+                        if(pega_tamanho_linha > 0 && arquivos->matriz_arquivo_menu[arquivos->conta_linhas_arquivo][pega_tamanho_linha - 1] == '\n')
+                        {
+                            /*Coloco \0 no final da minha string*/
+                            arquivos->matriz_arquivo_menu[arquivos->conta_linhas_arquivo][pega_tamanho_linha - 1] = '\0';
+                        }
+
+                        /*Incremento da linha da stirng do arquivo*/
+                        arquivos->conta_linhas_arquivo += 1;
+                    }
+                    
                 }
                 else
                 {
                     break;
                 }
 
-                /*Incremento da linha da stirng do arquivo*/
-                arquivos->conta_linhas_arquivo += 1;
             }
 
             /*A alocaca do meu vetor de estruturas deve ser feita aqui, pois somente preciso das linhas para serem alocadas, mais nada*/
@@ -160,9 +182,9 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
     /*Se caso os dois arquivos, seus retornos sao diferente de NULL, significa que foram abertos corretamente*/
     if(arq_config != NULL && arq_menus != NULL)
     {
+        /*Chamo a funcao para inicializar as estruturas*/
         Inicializa_estruturas_menus(menus, arquivos, &menu_config);
     }
-
 }
 
 /*Funcao resonsavel por automatizar a criacao de menus*/
@@ -170,12 +192,14 @@ int Menu(char *arquivo_menus, char *arquivo_cores)
 {
     ARQUIVOS arquivos;
 
+    /*Desliga o cursor*/
     setCursorStatus(DESLIGAR);
 
     /*Chamada da funcao para realizar a abertura e leitura dos arquivos*/
     Abre_arquivos_e_aloca_memoria(arquivo_menus, arquivo_cores, &arquivos);
 
     /*seta as cores originais do cmd*/
+    setCursorStatus(LIGAR);
     textcolor(LIGHTGRAY);
     textbackground(BLACK);
 
@@ -212,6 +236,8 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
     int i, j, index_string = 0;
     char caractere;
     char *delimitador;
+    char *corta_string;
+    char string_aux[TAM_BUFFER];
     int tamanho = 0;
     int index_aux = 0;
     int vetor_aux[TAM_VETOR_AUX_TOKENIZACAO];
@@ -260,9 +286,8 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
 
                 }
                 
-                /*Como a alocacao pega o \n e tem o \0 tambem, faco essa verificacao para pegar a letra de atalho, quando chega na ultima linha
-                entao nao e necessario pegar o -2, pois nao ha \n e sim o \0. Eh o que a outra parte da verificacao compara (j == tamanho - 1)*/
-                if((j == tamanho - 2 && caractere != '\n') || j == tamanho - 1)        
+                /*Verifico o final do arquivo, caso o indice chega ate la, pego o caractere correspondente, que sempre ficara no final do arquivo*/
+                if(j == tamanho - 1)        
                 {
                     /*Atribui a tecla de atalho na estrutura menus*/
                     menus[i]->letra_atalho = caractere;
@@ -272,22 +297,29 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
                 /*Verifica se e um digito o caractere*/
                 if(isdigit(caractere))
                 {
-                    /*Se caso j for 0, esta no id_pai*/
-                    if(j == 0)
-                    {
-                        menus[i]->id_pai = caractere - '0';
-                    }
+                    /*Copio para uma string auxiliar a minha original, pois strtok destroi a original*/
+                    strcpy(string_aux, arquivos->matriz_arquivo_menu[i]);
 
-                    /*Verifico o caractere anterior pra pegar o id unico do menu*/
-                    if(j == 2)
-                    {
-                        menus[i]->id = caractere - '0';
-                    }
-
-                    /*Pego a ordem do menu que sera apresentado, ja que a posicao nao muda, entao pego ele na posicao fixa do arquivo*/
-                    if(j == 4)
-                    {
-                        menus[i]->ordem = caractere - '0';
+                    /*Corto minha strings atraves do espaco em cada string*/
+                    corta_string = strtok(string_aux, " ");
+                    
+                    while(corta_string) 
+                    {   
+                        /*Verifico se na primeira posicao da minha substring tem o ", caso tenha nao e necessario continuar o loop*/
+                        if(corta_string[0] == '"')
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            /*Faz a atribuicao em cada variavel, VERIFICAR ESSA PARTE************/
+                            /*IDEIA DE CRIAR UM VETOR AUXILIAR QUE A CADA CORTE DA STRING COLOCO O ID CORRESPONDENTE*/
+                            menus[i]->id_pai = atoi(corta_string);
+                            menus[i]->id = atoi(corta_string);
+                            menus[i]->ordem = atoi(corta_string);
+                            corta_string = strtok(NULL, " ");
+                        }
+   
                     }
                 }
             }
@@ -311,8 +343,8 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
     /*Chamo a funcao para inicializar a estrutura contendo as variaveis para as cores do menu e suas configuracoes*/
     Inicializa_estrutura_cores(menu_config, vetor_aux);
 
-    /*Depois da alocacao e inicializacao das estruturas, chamo a funcao para exibir o menu*/
-    Exibe_menu_principal(menus, menu_config, arquivos);
+    /*Depois da alocacao e inicializacao das estruturas, chamo a funcao para exibir o menu
+    Exibe_menu_principal(menus, menu_config, arquivos);*/
 }
 
 
