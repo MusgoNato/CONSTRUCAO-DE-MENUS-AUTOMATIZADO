@@ -28,6 +28,9 @@ typedef struct menus_programa
 
     /*Tecla de atalho*/
     char letra_atalho;
+
+    /*Cada opcao contera sua determinada localizacao, coordenada de onde esta sendo impresso na tela*/
+    COORD posicao_menu;
 }MENU;
 
 typedef struct arquivos
@@ -37,6 +40,8 @@ typedef struct arquivos
     char vetor_arquivo_cores[TAM_LINHA_CONFIG];
     int conta_linhas_arquivo;
     EVENTO teclas_evento;
+    int posicao_teclas_user;
+    int tamanho_cada_string;
 
 }ARQUIVOS;
 
@@ -108,13 +113,20 @@ typedef struct config
 /*Funcao responsavel por ler os arquivos passados para realizar a verificacao se foram abertos e lidos de modo correto*/
 void Abre_arquivos_e_aloca_memoria(char *, char *, ARQUIVOS *);
 
-void Exibe_menu_principal(MENU **, MENU_CONFIG *, ARQUIVOS *);
+/*Funcao responsavel por exibir o menu principal*/
+void Exibe_menu_principal(MENU **, MENU_CONFIG *, ARQUIVOS *, int);
 
-/*Funcao responsavel por criar meus menus de acordo com os arquivos passados como argumento*/
-int Menu(char *, char *);
-
+/*Funcao responsavel por inicializar estruturas da configuracao do menu, cores, espacamento, largura, etc*/
 void Inicializa_estrutura_cores(MENU_CONFIG *, int []);
 
 /*Funcao para inicializar estrutura contendo os menus*/
 void Inicializa_estruturas_menus(MENU **, ARQUIVOS *,  MENU_CONFIG *);
+
+/*Funcao responsavel por criar meus menus de acordo com os arquivos passados como argumento*/
+int Menu(char *, char *);
+
+/*Funcao responsavel por ordenar os menus*/
+void Ordena_menus(MENU **, ARQUIVOS *);
+
+
 

@@ -1,8 +1,9 @@
-0 1 1 "Arquivo" A
-0 2 2 "Verifica√ß√£o" e
-1 3 1 "Op√ß√£o 1 do Menu 'Arquivo'" 1
-1 4 3 "Op√ß√£o 3 do Menu 'Arquivo'" 3
-1 5 2 "Op√ß√£o 2 do Menu 'Arquivo'" 2
-2 6 1 "Op√ß√£o 1 do Menu 'Verifica√ß√£o'" 1
-4 7 1 "SubsubOpcao 1" 1
-4 8 2 "SubsubOpcao 2" 2
+0 1 3 "Arquivo" A
+0 2 2 "Verificaá∆o" e
+0 3 1 "Mais um" M
+1 4 1 "Opá∆o 1 do Menu 'Arquivo'" 1
+1 5 3 "Opá∆o 3 do Menu 'Arquivo'" 3
+1 6 2 "Opá∆o 2 do Menu 'Arquivo'" 2
+2 7 1 "Opá∆o 1 do Menu 'Verificaá∆o'" 1
+4 8 1 "SubsubOpcao 1" 1
+4 9 2 "SubsubOpcao 2" 2

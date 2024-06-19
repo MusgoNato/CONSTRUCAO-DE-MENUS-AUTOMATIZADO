@@ -204,3 +204,58 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
         }while(caractere != EOF);
         
     }
+
+
+    /*Imprime meu menu na horizontal*/
+    for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
+    {
+        /*Verifico se e um menu principal, que sera impresso na horizontal*/
+        if(menus[i]->id_pai == 0)
+        {
+            /*Seto a impressao e imprimo o menu*/
+            gotoxy(menu_config->posicao_menu_principal.X + tamanho, menu_config->posicao_menu_principal.Y);
+            textbackground(menu_config->cor1);
+            
+            /*Faco o tamanho receber o tamanho da opcao mais o espacamento que tem na variavel da estrutura de configuracoes do menu*/
+            tamanho += strlen(menus[i]->nome_menu) + menu_config->espacamento;
+        }
+        else
+        {
+            /*Loop para submenus*/
+            for(j = 0; j < arquivos->conta_linhas_arquivo; j++)
+            {
+                /*Verifico os submenus*/
+                if(menus[i]->id_pai == menus[j]->id)
+                {
+                    gotoxy(menu_config->posicao_menu_principal.X + j, menu_config->posicao_menu_principal.Y + i);
+                    printf("%s", menus[i]->nome_menu);
+                }
+            }
+        }
+    }
+
+     /*Verifica-se se e uma acao do teclado*/
+    if(hit(KEYBOARD_HIT))
+    {
+        /*Pego o evento*/
+        arquivos->teclas_evento = Evento();
+
+        /*Caso seja do teclado*/
+        if(arquivos->teclas_evento.tipo_evento & KEY_EVENT)
+        {
+            /*Verifico a liberacao da tecla pressionada*/
+            if(arquivos->teclas_evento.teclado.status_tecla == LIBERADA)
+            {
+                switch(arquivos->teclas_evento.teclado.key_code)
+                {
+                    case ESC:
+                    {
+                        setCursorStatus(LIGAR);
+                        textbackground(BLACK);
+                        textcolor(LIGHTGRAY);
+                        exit(0);
+                        break;
+                    }
+                }
+            }
+        }

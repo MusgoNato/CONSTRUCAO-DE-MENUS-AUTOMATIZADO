@@ -191,7 +191,9 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
 int Menu(char *arquivo_menus, char *arquivo_cores)
 {
     ARQUIVOS arquivos;
-
+    arquivos.posicao_teclas_user = 0;
+    arquivos.tamanho_cada_string = 0;
+    
     /*Desliga o cursor*/
     setCursorStatus(DESLIGAR);
 
@@ -241,8 +243,9 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
     int tamanho = 0;
     int index_aux = 0;
     int vetor_aux[TAM_VETOR_AUX_TOKENIZACAO];
+    int index_menus = 0;
 
-    menu_config = menu_config;
+
     /*Esse loop mais externo percorre as linhas do meu arquivo menu.txt*/
     for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
     {
@@ -312,6 +315,10 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
                 }
             }
         }
+        
+        /*Inicializo todos os submenus com coordenada 1*/
+        menus[i]->posicao_menu.X = 1;
+        menus[i]->posicao_menu.Y = 1;
     }
 
     /*Tokenizo a string de acordo com os espacos*/
@@ -333,71 +340,28 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
     Inicializa_estrutura_cores(menu_config, vetor_aux);
 
     /*Depois da alocacao e inicializacao das estruturas, chamo a funcao para exibir o menu*/
-    Exibe_menu_principal(menus, menu_config, arquivos);
+    Exibe_menu_principal(menus, menu_config, arquivos, index_menus);
 }
 
 
 /*Funcao que exibe meu menu*/
-void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos)
+void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, int index_menus)
 {
-    int i, j;
-    int tamanho = 0;
-
-    /*A coordenada para impressao e setada pra 1, onde sera impresso meu menu principal*/
-    menu_config->posicao_menu_principal.X = 1;
-    menu_config->posicao_menu_principal.Y = 1; 
-
-    /*Imprime meu menu na horizontal*/
-    for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
+    /*Verifico se e um menu pai*/
+    if(menus[index_menus]->id_pai == 0)
     {
-        /*Verifico se e um menu principal, que sera impresso na horizontal*/
-        if(menus[i]->id_pai == 0)
-        {
-            /*Seto a impressao e imprimo o menu*/
-            gotoxy(menu_config->posicao_menu_principal.X + tamanho, menu_config->posicao_menu_principal.Y);
-            textbackground(menu_config->cor1);
-            printf("%s", menus[i]->nome_menu);
+        /*Seto o lugar de impressao na tela*/
+        gotoxy(1 + arquivos->tamanho_cada_string, 1);
+        printf("%s", menus[index_menus]->nome_menu);
 
-            /*Faco o tamanho receber o tamanho da opcao mais o espacamento que tem na variavel da estrutura de configuracoes do menu*/
-            tamanho = strlen(menus[i]->nome_menu) + menu_config->espacamento;
-        }
-        else
-        {
-            for(j = 0; j < arquivos->conta_linhas_arquivo; j++)
-            {
-                /*Verifico os submenus*/
-                if(menus[i]->id_pai == menus[j]->id)
-                {
-                    gotoxy(menu_config->posicao_menu_principal.X, menu_config->posicao_menu_principal.Y + i);
-                    printf("%s", menus[i]->nome_menu);
-                }
-            }
-            
-        }
-        
+        /*Espacamento de cada string*/
+        arquivos->tamanho_cada_string += strlen(menus[index_menus]->nome_menu) + menu_config->espacamento;
+
+        /*Chama a funcao recursiva*/
+        Exibe_menu_principal(menus, menu_config, arquivos, index_menus + 1);
     }
-
-    /*Verifica-se se e uma acao do teclado*/
-    if(hit(KEYBOARD_HIT))
+    else
     {
-        /*Pego o evento*/
-        arquivos->teclas_evento = Evento();
-
-        /*Caso seja do teclado*/
-        if(arquivos->teclas_evento.tipo_evento & KEY_EVENT)
-        {
-            /*Verifico a liberacao da tecla pressionada*/
-            if(arquivos->teclas_evento.teclado.status_tecla == LIBERADA)
-            {
-                /*Verifico o codigo da tecla*/
-                if(arquivos->teclas_evento.teclado.key_code == ESC)
-                {
-                    /*Ativa o cursor novamente*/
-                    setCursorStatus(LIGAR);
-                    exit(0);
-                }
-            }
-        }
+        exit(0);
     }
-    
 }

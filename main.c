@@ -24,6 +24,9 @@ main.exe*/
 /*Main principal do programa*/
 int main(int argc, char *argv[])
 {
+    /*Variavel para dimensionar a janela*/
+    COORD Janela;
+
     /*Variavel do id retornado pelo submenu*/
     int id_retorno;
     
@@ -33,11 +36,18 @@ int main(int argc, char *argv[])
 
     setlocale(LC_ALL, " ");
 
+    /*Pega a dimensao maxima da janela e seta a janela atual*/
+    Janela = MaxDimensaoJanela();
+    setDimensaoJanela(Janela.X, Janela.Y);
+
+    /*Limpa a tela*/
     clrscr();
+
     do
     {
         /*Chamada da funcao Menu() para a criacao dos menus*/
-        id_retorno = Menu("menu.txt", "config.txt");
+        id_retorno = Menu("asd.txt", "config.txt");
+
     }while(1);
     
     printf("Main : %d", id_retorno);
