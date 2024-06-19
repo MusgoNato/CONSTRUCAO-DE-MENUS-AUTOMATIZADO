@@ -302,25 +302,13 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
 
                     /*Corto minha strings atraves do espaco em cada string*/
                     corta_string = strtok(string_aux, " ");
-                    
-                    while(corta_string) 
-                    {   
-                        /*Verifico se na primeira posicao da minha substring tem o ", caso tenha nao e necessario continuar o loop*/
-                        if(corta_string[0] == '"')
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            /*Faz a atribuicao em cada variavel, VERIFICAR ESSA PARTE************/
-                            /*IDEIA DE CRIAR UM VETOR AUXILIAR QUE A CADA CORTE DA STRING COLOCO O ID CORRESPONDENTE*/
-                            menus[i]->id_pai = atoi(corta_string);
-                            menus[i]->id = atoi(corta_string);
-                            menus[i]->ordem = atoi(corta_string);
-                            corta_string = strtok(NULL, " ");
-                        }
-   
-                    }
+
+                    /*Converto e atribuo para o valor correspondente da estrutura*/
+                    menus[i]->id_pai = atoi(corta_string);
+                    corta_string = strtok(NULL, " ");
+                    menus[i]->id = atoi(corta_string);
+                    corta_string = strtok(NULL, " ");
+                    menus[i]->ordem = atoi(corta_string);
                 }
             }
         }
@@ -329,7 +317,7 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
     /*Tokenizo a string de acordo com os espacos*/
     delimitador = strtok(arquivos->vetor_arquivo_cores, " ");
 
-    /*Loop para pegar cada caractere e transformar em inteiro para meu vetor auxiliar*/
+    /*Loop para pegar cada caractere e transformar em inteiro para meu vetor auxiliar, esse loop e para o arquivo config.txt*/
     while(delimitador)
     {
         /*A cada indice do meu vetor faco a atribuicao em inteiro no meu vetor de inteiros, usando a funcao atoi()*/
@@ -340,11 +328,12 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
         index_aux++;
     }
 
+
     /*Chamo a funcao para inicializar a estrutura contendo as variaveis para as cores do menu e suas configuracoes*/
     Inicializa_estrutura_cores(menu_config, vetor_aux);
 
-    /*Depois da alocacao e inicializacao das estruturas, chamo a funcao para exibir o menu
-    Exibe_menu_principal(menus, menu_config, arquivos);*/
+    /*Depois da alocacao e inicializacao das estruturas, chamo a funcao para exibir o menu*/
+    Exibe_menu_principal(menus, menu_config, arquivos);
 }
 
 
