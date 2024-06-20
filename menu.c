@@ -7,14 +7,14 @@
 # include <string.h>
 # include "funcoes.h"
 
-/*Lembran‡a
-Id pai ‚ o identificador se ‚ um menu ou submenu, caso seja 0 ‚ menu e deve ser impresso na posi‡Æo horizontal, caso seja 1 ‚ um submenu
-e deve ser impresso em posi‡Æo vertical*/
+/*Lembranï¿½a
+Id pai ï¿½ o identificador se ï¿½ um menu ou submenu, caso seja 0 ï¿½ menu e deve ser impresso na posiï¿½ï¿½o horizontal, caso seja 1 ï¿½ um submenu
+e deve ser impresso em posiï¿½ï¿½o vertical*/
 
-/*Id, cada menu tem seu id, quando um submenu ‚ criado, o id_pai dele vai estar vinculado ao id de algum menu que veio antes dele, pois tem que ter
+/*Id, cada menu tem seu id, quando um submenu ï¿½ criado, o id_pai dele vai estar vinculado ao id de algum menu que veio antes dele, pois tem que ter
 essa ligacao, para saber de qual menu veio o submenu criado*/
 
-/*A ordem refere-se a ordem que os elementos vÆo ser colocados na tela, caso haja 2 ids_pais com valor 0, ha dois menu principal, algum deles vai ser impresso
+/*A ordem refere-se a ordem que os elementos vï¿½o ser colocados na tela, caso haja 2 ids_pais com valor 0, ha dois menu principal, algum deles vai ser impresso
 primeiro, a ordem determinara isso*/
 
 
@@ -244,6 +244,9 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
     int index_aux = 0;
     int vetor_aux[TAM_VETOR_AUX_TOKENIZACAO];
     int index_menus = 0;
+    menu_config->posicao_menu_principal.X = 1;
+    menu_config->posicao_menu_principal.Y = 1;
+
 
 
     /*Esse loop mais externo percorre as linhas do meu arquivo menu.txt*/
@@ -347,21 +350,80 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
 /*Funcao que exibe meu menu*/
 void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, int index_menus)
 {
+    /*Variavel evento para pegar as teclas do teclado*/
+    EVENTO tecla;
+
     /*Verifico se e um menu pai*/
     if(menus[index_menus]->id_pai == 0)
     {
         /*Seto o lugar de impressao na tela*/
-        gotoxy(1 + arquivos->tamanho_cada_string, 1);
+        gotoxy(menu_config->posicao_menu_principal.X + arquivos->tamanho_cada_string, menu_config->posicao_menu_principal.Y + menu_config->altura/menu_config->largura/2);
+
+        /*Verifico se o usuario esta na opcao correta*/
+        if(arquivos->posicao_teclas_user == index_menus)
+        {
+            /*Cor de texto e fundo da opcao selecionada do menu principal*/
+            textcolor(menu_config->cor3);
+            textbackground(menu_config->cor4);
+        }
+        
+        /*Imprime a opcao do menu*/
         printf("%s", menus[index_menus]->nome_menu);
+        
+        /*Cor das opcoes nao selecionadas do menu*/
+        textbackground(menu_config->cor2);
 
         /*Espacamento de cada string*/
         arquivos->tamanho_cada_string += strlen(menus[index_menus]->nome_menu) + menu_config->espacamento;
+    }
 
-        /*Chama a funcao recursiva*/
-        Exibe_menu_principal(menus, menu_config, arquivos, index_menus + 1);
-    }
-    else
+
+    /*Pego uma acao do teclado*/
+    if(hit(KEYBOARD_HIT))
     {
-        exit(0);
+        tecla = Evento();
+        
+        /*Pego o evento do teclado*/
+        if(tecla.tipo_evento & KEY_EVENT)
+        {
+            /*Verifico a liberacao da tecla*/
+            if(tecla.teclado.status_tecla == LIBERADA)
+            {
+                /*Cases para as teclas do teclado*/
+                switch(tecla.teclado.key_code)
+                {
+                    /*Saida por enquanto*/
+                    case ESC:
+                    {
+                        setCursorStatus(LIGAR);
+                        textcolor(LIGHTGRAY);
+                        textbackground(BLACK);
+                        exit(0);
+                        break;
+                    }
+
+                    /*Navegacao no menu*/
+                    case SETA_PARA_DIREITA:
+                    {
+                        arquivos->posicao_teclas_user++;
+                        break;
+                    }
+
+                    case SETA_PARA_ESQUERDA:
+                    {
+                        if(arquivos->posicao_teclas_user > 0)
+                        {
+                            arquivos->posicao_teclas_user--;
+                        }      
+                        break;
+                    }
+                }
+            }
+        }
     }
+    
+    /*Chama a funcao recursiva novamente*/
+    Exibe_menu_principal(menus, menu_config, arquivos, index_menus + 1);
+    
+
 }
