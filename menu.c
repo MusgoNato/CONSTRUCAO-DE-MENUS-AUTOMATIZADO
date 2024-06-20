@@ -378,6 +378,9 @@ void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arqu
     }
 
 
+    /*TENTAR VERIFICAR A ORDEM DOS MENUS, TENTAR ENCAIXAR ESSA LOGICA NA FUNCAO RECURSIVA,
+    OU CRIAR ALGO PARA FAZER LOOP E PEGAR A ORDEM MENOR DOS MENUS PAIS OU SUBMENUS*/
+
     /*Pego uma acao do teclado*/
     if(hit(KEYBOARD_HIT))
     {
