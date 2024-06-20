@@ -43,12 +43,9 @@ int main(int argc, char *argv[])
     /*Limpa a tela*/
     clrscr();
 
-    do
-    {
         /*Chamada da funcao Menu() para a criacao dos menus*/
         id_retorno = Menu("asd.txt", "config.txt");
 
-    }while(1);
     
     printf("Main : %d", id_retorno);
 

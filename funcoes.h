@@ -42,6 +42,7 @@ typedef struct arquivos
     EVENTO teclas_evento;
     int posicao_teclas_user;
     int tamanho_cada_string;
+    int index_menus;
 
 }ARQUIVOS;
 
@@ -114,7 +115,7 @@ typedef struct config
 void Abre_arquivos_e_aloca_memoria(char *, char *, ARQUIVOS *);
 
 /*Funcao responsavel por exibir o menu principal*/
-void Exibe_menu_principal(MENU **, MENU_CONFIG *, ARQUIVOS *, int);
+void Exibe_menu_principal(MENU **, MENU_CONFIG *, ARQUIVOS *);
 
 /*Funcao responsavel por inicializar estruturas da configuracao do menu, cores, espacamento, largura, etc*/
 void Inicializa_estrutura_cores(MENU_CONFIG *, int []);

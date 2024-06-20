@@ -7,14 +7,14 @@
 # include <string.h>
 # include "funcoes.h"
 
-/*Lembran�a
-Id pai � o identificador se � um menu ou submenu, caso seja 0 � menu e deve ser impresso na posi��o horizontal, caso seja 1 � um submenu
-e deve ser impresso em posi��o vertical*/
+/*Lembran?a
+Id pai ? o identificador se ? um menu ou submenu, caso seja 0 ? menu e deve ser impresso na posi??o horizontal, caso seja 1 ? um submenu
+e deve ser impresso em posi??o vertical*/
 
-/*Id, cada menu tem seu id, quando um submenu � criado, o id_pai dele vai estar vinculado ao id de algum menu que veio antes dele, pois tem que ter
+/*Id, cada menu tem seu id, quando um submenu ? criado, o id_pai dele vai estar vinculado ao id de algum menu que veio antes dele, pois tem que ter
 essa ligacao, para saber de qual menu veio o submenu criado*/
 
-/*A ordem refere-se a ordem que os elementos v�o ser colocados na tela, caso haja 2 ids_pais com valor 0, ha dois menu principal, algum deles vai ser impresso
+/*A ordem refere-se a ordem que os elementos v?o ser colocados na tela, caso haja 2 ids_pais com valor 0, ha dois menu principal, algum deles vai ser impresso
 primeiro, a ordem determinara isso*/
 
 
@@ -193,6 +193,7 @@ int Menu(char *arquivo_menus, char *arquivo_cores)
     ARQUIVOS arquivos;
     arquivos.posicao_teclas_user = 0;
     arquivos.tamanho_cada_string = 0;
+    arquivos.index_menus = 0;
     
     /*Desliga o cursor*/
     setCursorStatus(DESLIGAR);
@@ -243,7 +244,7 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
     int tamanho = 0;
     int index_aux = 0;
     int vetor_aux[TAM_VETOR_AUX_TOKENIZACAO];
-    int index_menus = 0;
+
     menu_config->posicao_menu_principal.X = 1;
     menu_config->posicao_menu_principal.Y = 1;
 
@@ -343,90 +344,45 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
     Inicializa_estrutura_cores(menu_config, vetor_aux);
 
     /*Depois da alocacao e inicializacao das estruturas, chamo a funcao para exibir o menu*/
-    Exibe_menu_principal(menus, menu_config, arquivos, index_menus);
+    Exibe_menu_principal(menus, menu_config, arquivos);
 }
 
 
 /*Funcao que exibe meu menu*/
-void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, int index_menus)
+void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos)
 {
-    /*Variavel evento para pegar as teclas do teclado*/
-    EVENTO tecla;
-
-    /*Verifico se e um menu pai*/
-    if(menus[index_menus]->id_pai == 0)
+    int i, j;
+    int troca;
+    
+    menu_config = menu_config;
+    
+    
+    /*Loop para percorrer e ordenar a ordem dos menus que serao impressos*/
+    for(i = 0 ; i < arquivos->conta_linhas_arquivo; i++)
     {
-        /*Seto o lugar de impressao na tela*/
-        gotoxy(menu_config->posicao_menu_principal.X + arquivos->tamanho_cada_string, menu_config->posicao_menu_principal.Y + menu_config->altura/menu_config->largura/2);
-
-        /*Verifico se o usuario esta na opcao correta*/
-        if(arquivos->posicao_teclas_user == index_menus)
+        /*Percorre para trocar os valores*/
+        for(j = 0; j < arquivos->conta_linhas_arquivo - i - 1; j++)
         {
-            /*Cor de texto e fundo da opcao selecionada do menu principal*/
-            textcolor(menu_config->cor3);
-            textbackground(menu_config->cor4);
-        }
-        
-        /*Imprime a opcao do menu*/
-        printf("%s", menus[index_menus]->nome_menu);
-        
-        /*Cor das opcoes nao selecionadas do menu*/
-        textbackground(menu_config->cor2);
-
-        /*Espacamento de cada string*/
-        arquivos->tamanho_cada_string += strlen(menus[index_menus]->nome_menu) + menu_config->espacamento;
-    }
-
-
-    /*TENTAR VERIFICAR A ORDEM DOS MENUS, TENTAR ENCAIXAR ESSA LOGICA NA FUNCAO RECURSIVA,
-    OU CRIAR ALGO PARA FAZER LOOP E PEGAR A ORDEM MENOR DOS MENUS PAIS OU SUBMENUS*/
-
-    /*Pego uma acao do teclado*/
-    if(hit(KEYBOARD_HIT))
-    {
-        tecla = Evento();
-        
-        /*Pego o evento do teclado*/
-        if(tecla.tipo_evento & KEY_EVENT)
-        {
-            /*Verifico a liberacao da tecla*/
-            if(tecla.teclado.status_tecla == LIBERADA)
+            /*Se caso for maior*/
+            if(menus[j]->ordem > menus[j + 1]->ordem && (menus[j]->id_pai == 0 && menus[j + 1]->id_pai == 0))
             {
-                /*Cases para as teclas do teclado*/
-                switch(tecla.teclado.key_code)
-                {
-                    /*Saida por enquanto*/
-                    case ESC:
-                    {
-                        setCursorStatus(LIGAR);
-                        textcolor(LIGHTGRAY);
-                        textbackground(BLACK);
-                        exit(0);
-                        break;
-                    }
-
-                    /*Navegacao no menu*/
-                    case SETA_PARA_DIREITA:
-                    {
-                        arquivos->posicao_teclas_user++;
-                        break;
-                    }
-
-                    case SETA_PARA_ESQUERDA:
-                    {
-                        if(arquivos->posicao_teclas_user > 0)
-                        {
-                            arquivos->posicao_teclas_user--;
-                        }      
-                        break;
-                    }
-                }
+                /*Variavel recebe o maior elemento*/
+                troca = menus[j]->ordem;
+                
+                /*O menor uma posicao a frente eh colocado na posicao atual, a do maior elemento*/
+                menus[j]->ordem = menus[j + 1]->ordem;
+                
+                /*A posicao com o menor elemento encontrado agora recebe o maior*/
+                menus[j + 1]->ordem = troca;
             }
         }
+        
     }
-    
-    /*Chama a funcao recursiva novamente*/
-    Exibe_menu_principal(menus, menu_config, arquivos, index_menus + 1);
-    
+
+    /*impressao*/
+    for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
+    {
+        printf("%d %d %d %s %c\n", menus[i]->id_pai, menus[i]->id, menus[i]->ordem, menus[i]->nome_menu, menus[i]->letra_atalho);
+    }
 
 }

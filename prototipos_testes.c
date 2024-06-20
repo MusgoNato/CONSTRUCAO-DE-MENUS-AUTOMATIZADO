@@ -259,3 +259,80 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
                 }
             }
         }
+
+
+
+        /*PROTOTIPO DA FUNÇÃO PARA IMPRESSAO DO MENU COM  ALGUMAS CORES*/
+        /*Variavel evento para pegar as teclas do teclado*/
+    EVENTO tecla;
+
+    while(1)
+    {
+        /*Verifico se e um menu pai*/
+        if(menus[arquivos->index_menus]->id_pai == 0)
+        {
+            /*Seto o lugar de impressao na tela*/
+            gotoxy(menu_config->posicao_menu_principal.X + arquivos->tamanho_cada_string, menu_config->posicao_menu_principal.Y + menu_config->altura/menu_config->largura/2);
+
+            /*Verifico se o usuario esta na opcao correta*/
+            if(arquivos->tamanho_cada_string == arquivos->posicao_teclas_user)
+            {
+                /*Cor de texto e fundo da opcao selecionada do menu principal*/
+                textcolor(menu_config->cor3);
+                textbackground(menu_config->cor4);
+            }
+            
+            /*Imprime a opcao do menu*/
+            printf("%s", menus[arquivos->index_menus]->nome_menu);
+            
+            /*Cor das opcoes nao selecionadas do menu*/
+            textbackground(menu_config->cor2);
+
+            /*Espacamento de cada string*/
+            arquivos->tamanho_cada_string += strlen(menus[arquivos->index_menus]->nome_menu) + menu_config->espacamento;
+
+            arquivos->index_menus++;
+        }
+
+
+        /*TENTAR VERIFICAR A ORDEM DOS MENUS, TENTAR ENCAIXAR ESSA LOGICA NA FUNCAO RECURSIVA,
+        OU CRIAR ALGO PARA FAZER LOOP E PEGAR A ORDEM MENOR DOS MENUS PAIS OU SUBMENUS*/
+
+        /*Pego uma acao do teclado*/
+        if(hit(KEYBOARD_HIT))
+        {
+            tecla = Evento();
+            
+            /*Pego o evento do teclado*/
+            if(tecla.tipo_evento & KEY_EVENT)
+            {
+                /*Verifico a liberacao da tecla*/
+                if(tecla.teclado.status_tecla == LIBERADA)
+                {
+                    /*Cases para as teclas do teclado*/
+                    switch(tecla.teclado.key_code)
+                    {
+                        /*Saida por enquanto*/
+                        case ESC:
+                        {
+                            setCursorStatus(LIGAR);
+                            textcolor(LIGHTGRAY);
+                            textbackground(BLACK);
+                            exit(0);
+                            break;
+                        }
+
+                        /*Navegacao no menu*/
+                        case SETA_PARA_DIREITA:
+                        {
+                            arquivos->posicao_teclas_user = arquivos->tamanho_cada_string;
+                            break;
+                        }
+
+                    }
+                }
+            }
+        }
+
+        
+    }
