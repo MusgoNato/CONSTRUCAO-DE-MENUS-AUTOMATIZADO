@@ -115,7 +115,7 @@ typedef struct config
 void Abre_arquivos_e_aloca_memoria(char *, char *, ARQUIVOS *);
 
 /*Funcao responsavel por exibir o menu principal*/
-void Exibe_menu_principal(MENU **, MENU_CONFIG *, ARQUIVOS *);
+void Ordena_menu_principal(MENU **, ARQUIVOS *);
 
 /*Funcao responsavel por inicializar estruturas da configuracao do menu, cores, espacamento, largura, etc*/
 void Inicializa_estrutura_cores(MENU_CONFIG *, int []);

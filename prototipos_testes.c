@@ -336,3 +336,25 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
 
         
     }
+
+     /*Loop para percorrer e ordenar a ordem dos menus que serao impressos*/
+    for(i = 0 ; i < arquivos->conta_linhas_arquivo; i++)
+    {
+        /*Percorre para trocar os valores*/
+        for(j = 0; j < arquivos->conta_linhas_arquivo - i - 1; j++)
+        {
+            /*Se caso for maior*/
+            if(menus[j]->ordem > menus[j + 1]->ordem && (menus[j]->id_pai == 0 && menus[j + 1]->id_pai == 0))
+            {
+                /*Variavel recebe o maior elemento*/
+                troca = menus[j]->ordem;
+                
+                /*O menor uma posicao a frente eh colocado na posicao atual, a do maior elemento*/
+                menus[j]->ordem = menus[j + 1]->ordem;
+                
+                /*A posicao com o menor elemento encontrado agora recebe o maior*/
+                menus[j + 1]->ordem = troca;
+            }
+        }
+        
+    }

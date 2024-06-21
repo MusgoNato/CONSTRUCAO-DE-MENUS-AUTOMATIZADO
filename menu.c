@@ -344,45 +344,64 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
     Inicializa_estrutura_cores(menu_config, vetor_aux);
 
     /*Depois da alocacao e inicializacao das estruturas, chamo a funcao para exibir o menu*/
-    Exibe_menu_principal(menus, menu_config, arquivos);
+    Ordena_menu_principal(menus, arquivos);
 }
 
 
 /*Funcao que exibe meu menu*/
-void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos)
+void Ordena_menu_principal(MENU **menus, ARQUIVOS *arquivos)
 {
-    int i, j;
-    int troca;
-    
-    menu_config = menu_config;
-    
-    
-    /*Loop para percorrer e ordenar a ordem dos menus que serao impressos*/
-    for(i = 0 ; i < arquivos->conta_linhas_arquivo; i++)
-    {
-        /*Percorre para trocar os valores*/
-        for(j = 0; j < arquivos->conta_linhas_arquivo - i - 1; j++)
-        {
-            /*Se caso for maior*/
-            if(menus[j]->ordem > menus[j + 1]->ordem && (menus[j]->id_pai == 0 && menus[j + 1]->id_pai == 0))
-            {
-                /*Variavel recebe o maior elemento*/
-                troca = menus[j]->ordem;
-                
-                /*O menor uma posicao a frente eh colocado na posicao atual, a do maior elemento*/
-                menus[j]->ordem = menus[j + 1]->ordem;
-                
-                /*A posicao com o menor elemento encontrado agora recebe o maior*/
-                menus[j + 1]->ordem = troca;
-            }
-        }
-        
-    }
+    int i, j, indice_para_troca;
+    MENU *troca;
+
+    printf("Antes\n\n");
 
     /*impressao*/
     for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
     {
         printf("%d %d %d %s %c\n", menus[i]->id_pai, menus[i]->id, menus[i]->ordem, menus[i]->nome_menu, menus[i]->letra_atalho);
+    }
+
+    /*Percorre as estruturas*/
+    for(i = 0; i < arquivos->conta_linhas_arquivo - 1; i++)
+    {
+        /*Verifica se o menu atual eh um id_pai*/
+        if(menus[i]->id_pai == 0)
+        {
+            /*O indice que vai servir para trocar as estruturas para ordenacao recebe a posicao do i*/
+            indice_para_troca = i;
+
+            /*Percorre novamente o arquivo*/
+            for(j = i + 1; j < arquivos->conta_linhas_arquivo; j++)
+            {
+                /*Verifica se o id pai da posicao j de menus eh um id_pai e se a ordem e menor que o indice pego antes*/
+                if(menus[j]->id_pai == 0 && menus[j]->ordem < menus[indice_para_troca]->ordem)
+                {
+                    /*Pego o indice atual de j, ou seja, achei o menor elemento*/
+                    indice_para_troca = j;
+                }
+            }
+            
+            /*Caso o indice de indice_para_troca seja diferente de j, se faz a troca*/
+            if(indice_para_troca != i)
+            {
+                /*A estrutura troca recebe toda a estrutura atual do indice de menus na posicao i*/
+                troca = menus[i];
+
+                /*No mesmo indice i, na estrutura menus, o valor do elemento na posicao indice_para_troca eh atribuido a menus[i]*/
+                menus[i] = menus[indice_para_troca];
+
+                /*E no indice_para_troca atribuo a estrutura pega de menus[i] anterirmente, colocando em troca*/
+                menus[indice_para_troca] = troca;
+
+                /*A troca acima eh realizada para toda estrutura, ou seja, ao inves de trocar as ordens de cada estrutura, melhor trocar a estrutura
+                como um todo, porque ai e ir imprimindo sequencialmente nesse caso, os id_pai == 0, pois as estruturas ja foram armazenadas como um todo*/
+
+            }
+        } 
+      
+        /*FAZER A ORDENACAO PARA SUBMENUS AGORA*/
+        
     }
 
 }
