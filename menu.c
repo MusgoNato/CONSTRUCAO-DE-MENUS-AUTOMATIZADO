@@ -343,46 +343,93 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
     /*Chamo a funcao para inicializar a estrutura contendo as variaveis para as cores do menu e suas configuracoes*/
     Inicializa_estrutura_cores(menu_config, vetor_aux);
 
-    /*Depois da alocacao e inicializacao das estruturas, chamo a funcao para exibir o menu*/
-    Ordena_menu_principal(menus, arquivos);
+    /*Depois da alocacao e inicializacao das estruturas, chamo a funcao para ordenar os menus como um todo*/
+    Ordena_menus(menus, arquivos);
+
+    /*Como os menus ja foram ordenados, chamo a funcao responsavel por exibir cada menu*/
+    Exibe_menu(menus, menu_config, arquivos);
+}
+
+/*Funcao responsavel por exibir os menus*/
+void Exibe_menu(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos)
+{
+    int i;
+    int tam_menus_desenhado = 0;
+    int tamanho_nome_menu = 0;
+    menus = menus;
+    menu_config = menu_config;
+    arquivos = arquivos;
+    
+    /*Imprime os menus principais, id_pai == 0*/
+    for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
+    {
+        /*Verifica se ‚ um id_pai*/
+       if(menus[i]->id_pai == 0)
+       {
+            /*Pega o tamanho de todos os ids pais*/
+            tam_menus_desenhado += strlen(menus[i]->nome_menu) + menu_config->espacamento;
+       }
+    }
+
+    /*O ultimo id_pai eh incrementado com o espacamento fixo, por isso eh necessario decrementar aqui*/
+    tam_menus_desenhado -= menu_config->espacamento;
+
+    /*Impressao do fundo do menu principal*/
+    for(i = 0; i < tam_menus_desenhado; i++)
+    {
+        /*Percorre as coordenadas preechendo com espacos*/
+        gotoxy(menu_config->posicao_menu_principal.X + i, menu_config->posicao_menu_principal.Y);
+        textbackground(BLUE);
+        printf(" ");
+    }
+
+    /*Percorre novamente os menus para imprimir com base no espacamento o nome dos menus*/
+    for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
+    {
+        /*Verifica se eh um id  pai o menu percorrido*/
+        if(menus[i]->id_pai == 0)
+        {
+            /*Seta a posicao da impressao*/
+            gotoxy(menu_config->posicao_menu_principal.X + tamanho_nome_menu, menu_config->posicao_menu_principal.Y);
+            textcolor(WHITE);
+
+            /*Imprime e pega o proximo tamanho a ser impresso*/
+            printf("%s", menus[i]->nome_menu);
+            tamanho_nome_menu += strlen(menus[i]->nome_menu) + menu_config->espacamento;
+        }
+        
+    }
+    
 }
 
 
-/*Funcao que exibe meu menu*/
-void Ordena_menu_principal(MENU **menus, ARQUIVOS *arquivos)
+/*Funcao responsavel por ordenar todos menus*/
+void Ordena_menus(MENU **menus, ARQUIVOS *arquivos)
 {
     int i, j, indice_para_troca;
+
+    /*Estrutura auxiliar que sera resposavel por trocar com outras de menor valor, baseados no id_pai e ordem*/
     MENU *troca;
-
-    printf("Antes\n\n");
-
-    /*impressao*/
-    for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
-    {
-        printf("%d %d %d %s %c\n", menus[i]->id_pai, menus[i]->id, menus[i]->ordem, menus[i]->nome_menu, menus[i]->letra_atalho);
-    }
 
     /*Percorre as estruturas*/
     for(i = 0; i < arquivos->conta_linhas_arquivo - 1; i++)
     {
-        /*Verifica se o menu atual eh um id_pai*/
-        if(menus[i]->id_pai == 0)
-        {
             /*O indice que vai servir para trocar as estruturas para ordenacao recebe a posicao do i*/
             indice_para_troca = i;
 
             /*Percorre novamente o arquivo*/
             for(j = i + 1; j < arquivos->conta_linhas_arquivo; j++)
             {
-                /*Verifica se o id pai da posicao j de menus eh um id_pai e se a ordem e menor que o indice pego antes*/
-                if(menus[j]->id_pai == 0 && menus[j]->ordem < menus[indice_para_troca]->ordem)
+                /*Verificacao para saber qual pai e menor que o outro na posicao onde o indice_para_troca foi pego, nesse modelo tanto o id_pai eh ordenado quanto o campo ordem de cada estrutura,
+                assim na impressao me gera a estrutura sequencialmente ordenada, do menor para o maior valor ordenado, pelo id_pai e ordem.*/
+                if(menus[j]->id_pai < menus[indice_para_troca]->id_pai || (menus[j]->id_pai == menus[indice_para_troca]->id_pai && menus[j]->ordem < menus[indice_para_troca]->ordem))
                 {
-                    /*Pego o indice atual de j, ou seja, achei o menor elemento*/
+                    /*Pego o indice atual de j, para fazer a troca depois na verificacao*/
                     indice_para_troca = j;
                 }
             }
             
-            /*Caso o indice de indice_para_troca seja diferente de j, se faz a troca*/
+            /*Caso o indice de indice_para_troca seja diferente de j, faz a troca*/
             if(indice_para_troca != i)
             {
                 /*A estrutura troca recebe toda a estrutura atual do indice de menus na posicao i*/
@@ -391,17 +438,13 @@ void Ordena_menu_principal(MENU **menus, ARQUIVOS *arquivos)
                 /*No mesmo indice i, na estrutura menus, o valor do elemento na posicao indice_para_troca eh atribuido a menus[i]*/
                 menus[i] = menus[indice_para_troca];
 
-                /*E no indice_para_troca atribuo a estrutura pega de menus[i] anterirmente, colocando em troca*/
+                /*Na estrutura a paritr do indice_para_troca, faco a troca de estruturas com a estrutura 'troca', pois ela esta com a estrutura que deve ser trocada*/
                 menus[indice_para_troca] = troca;
 
-                /*A troca acima eh realizada para toda estrutura, ou seja, ao inves de trocar as ordens de cada estrutura, melhor trocar a estrutura
-                como um todo, porque ai e ir imprimindo sequencialmente nesse caso, os id_pai == 0, pois as estruturas ja foram armazenadas como um todo*/
+                /*A troca acima eh realizada para toda estrutura, ou seja, ao inves de trocar as ordens de cada estrutura ou o id_pai, melhor trocar a estrutura
+                como um todo, porque ai e ir imprimindo sequencialmente nesse caso, pois as estruturas ja foram armazenadas e ordenadas como um todo*/
 
             }
-        } 
-      
-        /*FAZER A ORDENACAO PARA SUBMENUS AGORA*/
-        
     }
 
 }

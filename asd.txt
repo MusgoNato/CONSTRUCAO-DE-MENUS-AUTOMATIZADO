@@ -5,7 +5,5 @@
 1 5 3 "Op‡Æo 3 do Menu 'Arquivo'" 3
 1 6 2 "Op‡Æo 2 do Menu 'Arquivo'" 2
 2 7 1 "Op‡Æo 1 do Menu 'Verifica‡Æo'" 1
-0 8 1 "Maisumzin" a
 4 9 1 "SubsubOpcao 1" 1
 4 10 2 "SubsubOpcao 2" 2
-0 11 0 "asd" s

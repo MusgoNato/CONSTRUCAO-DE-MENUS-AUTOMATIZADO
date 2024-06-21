@@ -43,6 +43,8 @@ typedef struct arquivos
     int posicao_teclas_user;
     int tamanho_cada_string;
     int index_menus;
+    
+    int controla_impressao;
 
 }ARQUIVOS;
 
@@ -107,6 +109,7 @@ typedef struct config
 
     /*Pega a posicao do menu menu principal para imprimir na tela*/
     COORD posicao_menu_principal;
+
     
 }MENU_CONFIG;
 
@@ -114,8 +117,8 @@ typedef struct config
 /*Funcao responsavel por ler os arquivos passados para realizar a verificacao se foram abertos e lidos de modo correto*/
 void Abre_arquivos_e_aloca_memoria(char *, char *, ARQUIVOS *);
 
-/*Funcao responsavel por exibir o menu principal*/
-void Ordena_menu_principal(MENU **, ARQUIVOS *);
+/*Funcao resposanvel por exibir os menus*/
+void Exibe_menu(MENU **, MENU_CONFIG *, ARQUIVOS *);
 
 /*Funcao responsavel por inicializar estruturas da configuracao do menu, cores, espacamento, largura, etc*/
 void Inicializa_estrutura_cores(MENU_CONFIG *, int []);
@@ -126,8 +129,5 @@ void Inicializa_estruturas_menus(MENU **, ARQUIVOS *,  MENU_CONFIG *);
 /*Funcao responsavel por criar meus menus de acordo com os arquivos passados como argumento*/
 int Menu(char *, char *);
 
-/*Funcao responsavel por ordenar os menus*/
+/*Funcao responsavel por exibir o menu principal*/
 void Ordena_menus(MENU **, ARQUIVOS *);
-
-
-
