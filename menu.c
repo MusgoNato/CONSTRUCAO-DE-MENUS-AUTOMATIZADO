@@ -191,8 +191,9 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
 int Menu(char *arquivo_menus, char *arquivo_cores)
 {
     ARQUIVOS arquivos;
-    arquivos.posicao_teclas_user = 0;
+    arquivos.controla_impressao = 1;
     arquivos.tamanho_cada_string = 0;
+    arquivos.posicao_teclas_user = 1;
     arquivos.index_menus = 0;
     
     /*Desliga o cursor*/
@@ -356,9 +357,7 @@ void Exibe_menu(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos)
     int i;
     int tam_menus_desenhado = 0;
     int tamanho_nome_menu = 0;
-    menus = menus;
-    menu_config = menu_config;
-    arquivos = arquivos;
+    int conta_menus_principais = 0;
     
     /*Imprime os menus principais, id_pai == 0*/
     for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
@@ -379,26 +378,107 @@ void Exibe_menu(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos)
     {
         /*Percorre as coordenadas preechendo com espacos*/
         gotoxy(menu_config->posicao_menu_principal.X + i, menu_config->posicao_menu_principal.Y);
-        textbackground(BLUE);
+
+        /*Representa a cor de fundo da barra principal*/
+        textbackground(menu_config->cor1);
         printf(" ");
     }
 
-    /*Percorre novamente os menus para imprimir com base no espacamento o nome dos menus*/
-    for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
-    {
-        /*Verifica se eh um id  pai o menu percorrido*/
-        if(menus[i]->id_pai == 0)
-        {
-            /*Seta a posicao da impressao*/
-            gotoxy(menu_config->posicao_menu_principal.X + tamanho_nome_menu, menu_config->posicao_menu_principal.Y);
-            textcolor(WHITE);
 
-            /*Imprime e pega o proximo tamanho a ser impresso*/
-            printf("%s", menus[i]->nome_menu);
-            tamanho_nome_menu += strlen(menus[i]->nome_menu) + menu_config->espacamento;
+    /*Loop para pegar os eventos do teclado e imprimir o menu*/
+    do
+    {
+        if(arquivos->controla_impressao)
+        {
+            /*Zero novamento a variavel para pegar a impressao de novo na proxima vez*/
+            tamanho_nome_menu = 0;
+
+            /*Zero novamente a variavel que conta menus principais, eh necessario para nao ultrapassar o limite de aonde o usuario estara navegando*/
+            conta_menus_principais = 0;
+
+            /*Percorre novamente os menus para imprimir com base no espacamento o nome dos menus*/
+            for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
+            {
+                /*Verifica se eh um id pai o menu percorrido*/
+                if(menus[i]->id_pai == 0)
+                {
+                    /*Incremento a contagem de pais achados*/
+                    conta_menus_principais++;
+
+                    /*Seta a posicao da impressao*/
+                    gotoxy(menu_config->posicao_menu_principal.X + tamanho_nome_menu, menu_config->posicao_menu_principal.Y);
+
+                    if(arquivos->posicao_teclas_user == menus[i]->ordem)
+                    {
+                        textcolor(RED);
+                    }
+
+                    /*Imprime e pega o proximo tamanho a ser impresso*/
+                    printf("%s", menus[i]->nome_menu);
+                    tamanho_nome_menu += strlen(menus[i]->nome_menu) + menu_config->espacamento;
+                    textcolor(WHITE);
+                }
+                
+            }
+
+            /*Zero a variavel de controle para impressao*/
+            arquivos->controla_impressao = 0;
         }
         
-    }
+        /*Verifico se ha um hit do teclado*/
+        if(hit(KEYBOARD_HIT))
+        {
+            /*Pego a tecla do teclado*/
+            arquivos->teclas_evento = Evento();
+        
+            /*Verifico se eh um evento do teclado*/
+            if(arquivos->teclas_evento.tipo_evento & KEY_EVENT)
+            {
+                /*Verifico se esta libreada a tecla*/
+                if(arquivos->teclas_evento.teclado.status_tecla == LIBERADA)
+                {
+                    /*Pego as teclas*/
+                    switch(arquivos->teclas_evento.teclado.key_code)
+                    {   
+                        /*Saida temporaria do programa*/
+                        case ESC:
+                        {
+                            exit(0);
+                            textbackground(BLACK);
+                            textcolor(LIGHTGRAY);
+                            break;
+                        }
+
+                        case SETA_PARA_DIREITA:
+                        {
+                            /*Verificacao a posicao em que o usuario esta, se caso for maior do que 0 e menor do que a contagem dos menus principais*/
+                            if(arquivos->posicao_teclas_user >= 0 && arquivos->posicao_teclas_user <= conta_menus_principais)
+                            {
+                                /*Incremento a posicao onde o usuario esta e volto a seta a variavel de controle para 1, para impreimir novamente meu menu*/
+                                arquivos->posicao_teclas_user++;
+                                arquivos->controla_impressao = 1;   
+                            }
+                            break;
+                        }
+
+                        case SETA_PARA_ESQUERDA:
+                        {
+                            /*Verificacao para decrementar a posicao do usuario*/
+                            if(arquivos->posicao_teclas_user > 0)
+                            {
+                                /*Decremento e volto a variavel de controle para impressao do meu menu novamente*/
+                                arquivos->posicao_teclas_user--;
+                                arquivos->controla_impressao = 1;
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+    }while(1);
+    
     
 }
 
