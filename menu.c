@@ -195,6 +195,8 @@ int Menu(char *arquivo_menus, char *arquivo_cores)
     arquivos.tamanho_cada_string = 0;
     arquivos.posicao_teclas_user = 1;
     arquivos.index_menus = 0;
+    arquivos.controla_atalho = 0;
+    arquivos.enter_pressionado = 0;
     
     /*Desliga o cursor*/
     setCursorStatus(DESLIGAR);
@@ -388,6 +390,7 @@ void Exibe_menu(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos)
     /*Loop para pegar os eventos do teclado e imprimir o menu*/
     do
     {
+        /*Verificacao para controlar a impressao do meu menu*/
         if(arquivos->controla_impressao)
         {
             /*Zero novamento a variavel para pegar a impressao de novo na proxima vez*/
@@ -408,15 +411,20 @@ void Exibe_menu(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos)
                     /*Seta a posicao da impressao*/
                     gotoxy(menu_config->posicao_menu_principal.X + tamanho_nome_menu, menu_config->posicao_menu_principal.Y);
 
+                    /*Verifica a posicao, para saber aonde o usuario esta navegando*/
                     if(arquivos->posicao_teclas_user == menus[i]->ordem)
                     {
-                        textcolor(RED);
+                        /*Quando o enter for pressionado, a cor da posicao aonde o usuario esta navegando ira mudar de cor, essa propria
+                        verificacao serve para manter o visual de navegacao de uma opcao a outra*/
+                        textcolor(menu_config->cor3);
                     }
 
                     /*Imprime e pega o proximo tamanho a ser impresso*/
                     printf("%s", menus[i]->nome_menu);
                     tamanho_nome_menu += strlen(menus[i]->nome_menu) + menu_config->espacamento;
-                    textcolor(WHITE);
+
+                    /*Cor do texto das opcoes nao selecionadas do menu principal (ELA MUDA PARA WHITE QUANDO SELECIONADA)*/
+                    textcolor(menu_config->cor7);
                 }
                 
             }
@@ -443,9 +451,9 @@ void Exibe_menu(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos)
                         /*Saida temporaria do programa*/
                         case ESC:
                         {
-                            exit(0);
                             textbackground(BLACK);
                             textcolor(LIGHTGRAY);
+                            exit(0);
                             break;
                         }
 
@@ -464,7 +472,7 @@ void Exibe_menu(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos)
                         case SETA_PARA_ESQUERDA:
                         {
                             /*Verificacao para decrementar a posicao do usuario*/
-                            if(arquivos->posicao_teclas_user > 0)
+                            if(arquivos->posicao_teclas_user > 2)
                             {
                                 /*Decremento e volto a variavel de controle para impressao do meu menu novamente*/
                                 arquivos->posicao_teclas_user--;
@@ -472,6 +480,13 @@ void Exibe_menu(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos)
                             }
                             break;
                         }
+
+                        case ENTER:
+                        {
+                            arquivos->enter_pressionado = 1;
+                            break;
+                        }
+
                     }
                 }
             }

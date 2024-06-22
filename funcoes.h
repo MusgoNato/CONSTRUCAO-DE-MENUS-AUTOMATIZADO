@@ -10,6 +10,7 @@
 # define TAM_LINHA_CONFIG 100
 # define TAM_VETOR_MENU_CONFIG 20 
 # define TAM_VETOR_AUX_TOKENIZACAO 19
+# define ALT_ESQUERDO LEFT_ALT_PRESSED
 
 /*Declaracao de estruturas*/
 typedef struct menus_programa
@@ -44,7 +45,9 @@ typedef struct arquivos
     int tamanho_cada_string;
     int index_menus;
     
+    int enter_pressionado;
     int controla_impressao;
+    int controla_atalho;
 
 }ARQUIVOS;
 
