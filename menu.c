@@ -197,6 +197,9 @@ int Menu(char *arquivo_menus, char *arquivo_cores)
     arquivos.index_menus = 0;
     arquivos.controla_atalho = 0;
     arquivos.enter_pressionado = 0;
+    arquivos.cont_menu_principal = 0;
+    arquivos.cont_submenus = 0;
+    arquivos.controla_alt = 0;
     
     /*Desliga o cursor*/
     setCursorStatus(DESLIGAR);
@@ -349,22 +352,104 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
     /*Depois da alocacao e inicializacao das estruturas, chamo a funcao para ordenar os menus como um todo*/
     Ordena_menus(menus, arquivos);
 
-    /*Como os menus ja foram ordenados, chamo a funcao responsavel por exibir cada menu*/
-    Exibe_menu(menus, menu_config, arquivos);
+    /*Chama a funcao para contagem dos menus e submenus das estruturas*/
+    Contagem_menus_submenus(menus, arquivos);
+
+    /*Como os menus ja foram ordenados, chamo a funcao responsavel por exibir cada menu principal*/
+    Exibe_menu_principal(menus, menu_config, arquivos);
+}
+
+/*Funcao responsavel por contar a quantidade de menus e submenus*/
+void Contagem_menus_submenus(MENU **menus, ARQUIVOS *arquivos)
+{
+    int i;
+    for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
+    {
+        /*Caso seja pai*/
+        if(menus[i]->id_pai == 0)
+        {
+            arquivos->cont_menu_principal++;
+        }   
+        /*Caso seja submenu*/
+        else
+        {
+            arquivos->cont_submenus++;
+        }
+    }
+}
+
+void Desenha_Janela_Principal(MENU_CONFIG *menu_config, int tam_menus_desenhado)
+{
+    int i, j;
+
+    /*Desenha a janela toda*/
+    for(i = 0; i < menu_config->altura; i++)
+    {
+        for(j = 0; j < tam_menus_desenhado; j++)
+        {
+            gotoxy(menu_config->posicao_menu_principal.X + j, menu_config->posicao_menu_principal.Y + menu_config->altura/menu_config->largura + 1 + i);
+            
+            /*Cor do fundo da janela principal*/
+            textbackground(menu_config->cor13);
+            printf(" ");
+        }
+    }
+
+    /*Linha superior*/
+    for(i = 0; i < tam_menus_desenhado; i++)
+    {
+        /*Seta a posicao de impressao*/
+        gotoxy(menu_config->posicao_menu_principal.X + i, menu_config->posicao_menu_principal.Y + menu_config->altura/menu_config->largura + 1);
+        
+        /*Cor da borda da janela e cor de fundo da borda da janela*/
+        textcolor(menu_config->cor15);
+        textbackground(menu_config->cor16);
+        printf("-");
+    }
+
+    /*Coluna esquerda*/
+    for(i = 0; i < menu_config->altura; i++)   
+    {
+        gotoxy(menu_config->posicao_menu_principal.X, menu_config->posicao_menu_principal.Y + menu_config->altura/menu_config->largura + i + 1);
+        textcolor(menu_config->cor15);
+        textbackground(menu_config->cor16);
+        printf("|");
+    }
+
+    /*Coluna direita*/
+    for(i = 0; i < menu_config->altura; i++)
+    {
+        gotoxy(tam_menus_desenhado, menu_config->posicao_menu_principal.Y + menu_config->altura/menu_config->largura + i + 1);
+        textcolor(menu_config->cor15);
+        textbackground(menu_config->cor16);
+        printf("|");
+    }
+
+    /*Linha inferior*/
+    for(i = 0; i < tam_menus_desenhado; i++)
+    {   
+        gotoxy(menu_config->posicao_menu_principal.X + i, menu_config->posicao_menu_principal.Y + menu_config->altura/menu_config->largura + menu_config->altura + 1);
+        textcolor(menu_config->cor15);
+        textbackground(menu_config->cor16);
+        printf("-");
+    }
+    
+
 }
 
 /*Funcao responsavel por exibir os menus*/
-void Exibe_menu(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos)
+void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos)
 {
     int i;
     int tam_menus_desenhado = 0;
     int tamanho_nome_menu = 0;
-    int conta_menus_principais = 0;
+    char *posicao_letra;
+    int index_letra_atalho;
     
     /*Imprime os menus principais, id_pai == 0*/
     for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
     {
-        /*Verifica se ‚ um id_pai*/
+        /*Verifica se Ã© um id_pai*/
        if(menus[i]->id_pai == 0)
        {
             /*Pega o tamanho de todos os ids pais*/
@@ -374,6 +459,9 @@ void Exibe_menu(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos)
 
     /*O ultimo id_pai eh incrementado com o espacamento fixo, por isso eh necessario decrementar aqui*/
     tam_menus_desenhado -= menu_config->espacamento;
+
+    /*Chama a funcao para fazer as linhas e colunas da borda da janela principal, aonde estara os submenus*/
+    Desenha_Janela_Principal(menu_config, tam_menus_desenhado);
 
     /*Impressao do fundo do menu principal*/
     for(i = 0; i < tam_menus_desenhado; i++)
@@ -386,53 +474,71 @@ void Exibe_menu(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos)
         printf(" ");
     }
 
-
     /*Loop para pegar os eventos do teclado e imprimir o menu*/
     do
     {
-        /*Verificacao para controlar a impressao do meu menu*/
+        /*Controle de impressao do meu menu principal*/
         if(arquivos->controla_impressao)
         {
-            /*Zero novamento a variavel para pegar a impressao de novo na proxima vez*/
+            /*Eh zerada a variavel para nao extrapolar a impressao novamente, pois esta dentro de um loop infinito*/
             tamanho_nome_menu = 0;
 
-            /*Zero novamente a variavel que conta menus principais, eh necessario para nao ultrapassar o limite de aonde o usuario estara navegando*/
-            conta_menus_principais = 0;
-
-            /*Percorre novamente os menus para imprimir com base no espacamento o nome dos menus*/
-            for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
+            /*For para percorrer os menus principais*/
+            for(i = 0; i < arquivos->cont_menu_principal; i++)
             {
-                /*Verifica se eh um id pai o menu percorrido*/
-                if(menus[i]->id_pai == 0)
+                /*Seta o lugar de impressao*/
+                gotoxy(menu_config->posicao_menu_principal.X + tamanho_nome_menu, menu_config->posicao_menu_principal.Y);
+
+                /*Verificacao para navegacao e exibicao da selecao de um menu*/
+                if(arquivos->posicao_teclas_user == menus[i]->ordem)
                 {
-                    /*Incremento a contagem de pais achados*/
-                    conta_menus_principais++;
+                    /*Cor de navegacao do menu principal*/
+                    textcolor(BLUE);
 
-                    /*Seta a posicao da impressao*/
-                    gotoxy(menu_config->posicao_menu_principal.X + tamanho_nome_menu, menu_config->posicao_menu_principal.Y);
-
-                    /*Verifica a posicao, para saber aonde o usuario esta navegando*/
-                    if(arquivos->posicao_teclas_user == menus[i]->ordem)
+                    /*Verifica se o enter foi pressionado ou nao de acordo com a posicao aonde o usuario esta*/
+                    if(arquivos->enter_pressionado)
                     {
-                        /*Quando o enter for pressionado, a cor da posicao aonde o usuario esta navegando ira mudar de cor, essa propria
-                        verificacao serve para manter o visual de navegacao de uma opcao a outra*/
+
+                        /*Representa a cor de texto e fundo da opcao selecionada*/
                         textcolor(menu_config->cor3);
+                        textbackground(menu_config->cor4);
+                        printf("%s", menus[i]->nome_menu);
+                        
+                        /*Cor da letra de atalho quando a opcao for selecionada*/
+                        gotoxy(menu_config->posicao_menu_principal.X + tamanho_nome_menu + index_letra_atalho, menu_config->posicao_menu_principal.Y);
+                        textcolor(menu_config->cor6);
+                        printf("%c", menus[i]->nome_menu[index_letra_atalho]);
+                        exit(0);
+                        
                     }
-
-                    /*Imprime e pega o proximo tamanho a ser impresso*/
-                    printf("%s", menus[i]->nome_menu);
-                    tamanho_nome_menu += strlen(menus[i]->nome_menu) + menu_config->espacamento;
-
-                    /*Cor do texto das opcoes nao selecionadas do menu principal (ELA MUDA PARA WHITE QUANDO SELECIONADA)*/
-                    textcolor(menu_config->cor7);
                 }
-                
+
+                /*Imprime o menu*/
+                printf("%s", menus[i]->nome_menu);
+
+                /*Pego a posicao da primeira ocorrencia da letra de atalho*/
+                posicao_letra = strchr(menus[i]->nome_menu, menus[i]->letra_atalho);
+                index_letra_atalho = posicao_letra - menus[i]->nome_menu;
+                gotoxy(menu_config->posicao_menu_principal.X + tamanho_nome_menu + index_letra_atalho, menu_config->posicao_menu_principal.Y);
+                textcolor(menu_config->cor5);
+                printf("%c", menus[i]->nome_menu[index_letra_atalho]);
+
+                /*Representa a cor da opcao nao selecionada de um menu*/
+                textcolor(menu_config->cor2);
+                textbackground(menu_config->cor1);
+
+                /*Armazena o espacamento de cada nome de menu, entre um e outro*/
+                tamanho_nome_menu += strlen(menus[i]->nome_menu) + menu_config->espacamento;
+
             }
 
-            /*Zero a variavel de controle para impressao*/
+            /*O controle do enter volta a zerar*/
+            arquivos->enter_pressionado = 0;
+
+            /*Volta a zerar o controle de impressao*/
             arquivos->controla_impressao = 0;
         }
-        
+
         /*Verifico se ha um hit do teclado*/
         if(hit(KEYBOARD_HIT))
         {
@@ -460,10 +566,10 @@ void Exibe_menu(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos)
                         case SETA_PARA_DIREITA:
                         {
                             /*Verificacao a posicao em que o usuario esta, se caso for maior do que 0 e menor do que a contagem dos menus principais*/
-                            if(arquivos->posicao_teclas_user >= 0 && arquivos->posicao_teclas_user <= conta_menus_principais)
+                            if(arquivos->posicao_teclas_user < arquivos->cont_menu_principal)
                             {
                                 /*Incremento a posicao onde o usuario esta e volto a seta a variavel de controle para 1, para impreimir novamente meu menu*/
-                                arquivos->posicao_teclas_user++;
+                                arquivos->posicao_teclas_user += 1;
                                 arquivos->controla_impressao = 1;   
                             }
                             break;
@@ -471,11 +577,10 @@ void Exibe_menu(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos)
 
                         case SETA_PARA_ESQUERDA:
                         {
-                            /*Verificacao para decrementar a posicao do usuario*/
-                            if(arquivos->posicao_teclas_user > 2)
+                            /*Verifcacao para decremento da navegacao do menu principal, tem que ser > que 1 pois a ordem dos menus comeca pelo numero 1*/
+                            if(arquivos->posicao_teclas_user > 1)
                             {
-                                /*Decremento e volto a variavel de controle para impressao do meu menu novamente*/
-                                arquivos->posicao_teclas_user--;
+                                arquivos->posicao_teclas_user -= 1;
                                 arquivos->controla_impressao = 1;
                             }
                             break;
@@ -484,9 +589,20 @@ void Exibe_menu(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos)
                         case ENTER:
                         {
                             arquivos->enter_pressionado = 1;
+                            arquivos->controla_impressao = 1;
                             break;
                         }
 
+                    }
+                }
+                else
+                {
+                    if(arquivos->teclas_evento.teclado.status_teclas_controle & ALT_ESQUERDO)
+                    {
+                        arquivos->controla_alt = 1;
+
+                        /*Pego a proxima tecla a ser presionada, para verificacao dos menus
+                        atalho_menu = arquivos->teclas_evento.teclado.ascii_code;*/
                     }
                 }
             }

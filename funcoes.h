@@ -48,6 +48,10 @@ typedef struct arquivos
     int enter_pressionado;
     int controla_impressao;
     int controla_atalho;
+    int cont_menu_principal;
+    int cont_submenus;
+
+    int controla_alt;
 
 }ARQUIVOS;
 
@@ -120,8 +124,14 @@ typedef struct config
 /*Funcao responsavel por ler os arquivos passados para realizar a verificacao se foram abertos e lidos de modo correto*/
 void Abre_arquivos_e_aloca_memoria(char *, char *, ARQUIVOS *);
 
-/*Funcao resposanvel por exibir os menus*/
-void Exibe_menu(MENU **, MENU_CONFIG *, ARQUIVOS *);
+void Acha_atalho(MENU **, ARQUIVOS *, char);
+
+void Contagem_menus_submenus(MENU **, ARQUIVOS *);
+
+void Desenha_Janela_Principal(MENU_CONFIG *, int );
+
+/*Funcao resposanvel por exibir os menus principais*/
+void Exibe_menu_principal(MENU **, MENU_CONFIG *, ARQUIVOS *);
 
 /*Funcao responsavel por inicializar estruturas da configuracao do menu, cores, espacamento, largura, etc*/
 void Inicializa_estrutura_cores(MENU_CONFIG *, int []);

@@ -358,3 +358,56 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
         }
         
     }
+
+
+
+    /*Verificacao para controlar a impressao do meu menu*/
+        if(arquivos->controla_impressao)
+        {
+            /*Zero novamento a variavel para pegar a impressao de novo na proxima vez*/
+            tamanho_nome_menu = 0;
+
+            /*Zero novamente a variavel que conta menus principais, eh necessario para nao ultrapassar o limite de aonde o usuario estara navegando*/
+            conta_menus_principais = 0;
+
+            /*Percorre novamente os menus para imprimir com base no espacamento o nome dos menus*/
+            for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
+            {
+                /*Verifica se eh um id pai o menu percorrido*/
+                if(menus[i]->id_pai == 0)
+                {
+                    /*Incremento a contagem de pais achados*/
+                    conta_menus_principais++;
+
+                    /*Seta a posicao da impressao*/
+                    gotoxy(menu_config->posicao_menu_principal.X + tamanho_nome_menu, menu_config->posicao_menu_principal.Y);
+
+                    /*Verifica a posicao, para saber aonde o usuario esta navegando*/
+                    if(arquivos->posicao_teclas_user == menus[i]->ordem)
+                    {
+                        /*Quando o enter for pressionado, a cor da posicao aonde o usuario esta navegando ira mudar de cor, essa propria
+                        verificacao serve para manter o visual de navegacao de uma opcao a outra*/
+                        textcolor(menu_config->cor3);
+
+                        /*Verificacao para quando apertar uma opcao*/
+                        if(arquivos->enter_pressionado)
+                        {
+                            /*Representa a cor de fundo da opcao selecionada do menu principal*/
+                            textbackground(menu_config->cor4);
+                        }
+                    }
+
+                    /*Imprime e pega o proximo tamanho a ser impresso*/
+                    printf("%s", menus[i]->nome_menu);
+                    tamanho_nome_menu += strlen(menus[i]->nome_menu) + menu_config->espacamento;
+
+                    /*Representa a cor do texto da opcao nao selecionada do menu principal*/
+                    textcolor(menu_config->cor2);
+                }
+                
+            }
+
+            /*Zero a variavel de controle para impressao*/
+            arquivos->controla_impressao = 0;
+        }
+        
