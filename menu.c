@@ -1,22 +1,14 @@
 /*Logica das funcoes utilizadas no decorrer do programa*/
 
 /*Inclusao de bibliotecas*/
-# include <ctype.h>
-# include <stdio.h>
-# include <stdlib.h>
-# include <string.h>
-# include "funcoes.h"
-
-/*Lembran?a
-Id pai ? o identificador se ? um menu ou submenu, caso seja 0 ? menu e deve ser impresso na posi??o horizontal, caso seja 1 ? um submenu
-e deve ser impresso em posi??o vertical*/
-
-/*Id, cada menu tem seu id, quando um submenu ? criado, o id_pai dele vai estar vinculado ao id de algum menu que veio antes dele, pois tem que ter
-essa ligacao, para saber de qual menu veio o submenu criado*/
-
-/*A ordem refere-se a ordem que os elementos v?o ser colocados na tela, caso haja 2 ids_pais com valor 0, ha dois menu principal, algum deles vai ser impresso
-primeiro, a ordem determinara isso*/
-
+# include <ctype.h> /*isdigit()*/
+# include <stdio.h> /*fclose(), fgetc(), fgets(), fopen(), fseek(), printf()*/
+# include <stdlib.h> /*atoi(), malloc(), free()*/
+# include <string.h> /*strchr(), strcpy(), strlen(), strtok() */
+# include "console_v1.5.5.h" /*Evento(), hit(), setCursorStatus()*/
+# include "conio_v3.2.4.h" /*gotoxy(), texbackground(), texcolor(), wherexy()*/
+# include "funcoes.h" /*Abre_arquivos_e_aloca_memoria(), Contagem_menus_submenus(), Desenha_Janela_Principal(), Desenha_Janela_submenus(),
+Exibe_menu_principal(), Exibe_submenus(), Inicializa_estrutura_cores(), Inicializa_estruturas_menus(), Menu(), Ordena_menus()*/
 
 /*Funcao responsavel por ler os arquivos passados como parametros na funcao Menu()*/
 void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQUIVOS *arquivos)
@@ -378,6 +370,7 @@ void Contagem_menus_submenus(MENU **menus, ARQUIVOS *arquivos)
     }
 }
 
+/*Funcao responsavel por desenhar a janela principal*/
 void Desenha_Janela_Principal(MENU_CONFIG *menu_config, int tam_menus_desenhado)
 {
     int i, j;
@@ -437,6 +430,135 @@ void Desenha_Janela_Principal(MENU_CONFIG *menu_config, int tam_menus_desenhado)
 
 }
 
+/*Funcao responsavel por imprimir meus submenus*/
+void Desenha_Janela_submenus(MENU_CONFIG *menu_config, ARQUIVOS *arquivos, int quantidade_submenus, int largura_janela_submenu)
+{
+    int i, j, index_para_espacos = 0;
+
+    /*Mini janela dos submenus*/
+    for(i = 0; i < quantidade_submenus + ESPACAMENTO_INICIO_FINAL_OPCAO; i++)
+    {
+        for(j = 0; j < largura_janela_submenu; j++)
+        {
+            /*Adiciona espacos adicionais no comeco da linha*/
+            if(j == 0)
+            {
+                /*Seto o lugar de impressao*/
+                gotoxy(arquivos->posicao_submenus.X + j, arquivos->posicao_submenus.Y + i + 1);
+
+                /*Caso seja igual a 0 o j, coloco espacos adicionais, pra dar uma profundidade*/
+                for(index_para_espacos = 0; index_para_espacos < ESPACAMENTO_INICIO_FINAL_OPCAO; index_para_espacos++)
+                {
+                    /*Muda o fundo do submenu*/
+                    textbackground(menu_config->cor7);
+                    printf(" ");
+                }    
+            }
+
+            /*Volto a setar as coordenadas, porem dessa vez somando o espamento inicial dado*/
+            gotoxy(arquivos->posicao_submenus.X + j + ESPACAMENTO_INICIO_FINAL_OPCAO, arquivos->posicao_submenus.Y + i + 1);
+            textbackground(menu_config->cor7);
+            printf(" ");
+
+            /*Verifico se cheguei no final da largura, caso sim imprime os espacos finais adicionais*/
+            if(j == largura_janela_submenu - 1)
+            {
+                for(index_para_espacos = 0; index_para_espacos < ESPACAMENTO_INICIO_FINAL_OPCAO; index_para_espacos++)
+                {
+                    textbackground(menu_config->cor7);
+                    printf(" ");
+                }
+            }
+        }
+    }
+
+    /*Linha superior*/
+    for(i = 0; i < largura_janela_submenu + ESPACAMENTO_INICIO_FINAL_OPCAO * 2; i++)
+    {
+        /*Cor de fundo das janelas dos submenus*/
+        gotoxy(arquivos->posicao_submenus.X + i, arquivos->posicao_submenus.Y + 1);
+        
+        /*A cor do texto vai ser preta como padrao, pois no arquivo de consulta nao dizia se mudaria ou nao*/
+        textcolor(BLACK);
+        textbackground(menu_config->cor7);
+        printf("-");
+    }
+
+    /*Coluna esquerda*/
+    for(i = 0; i < quantidade_submenus; i++)
+    {
+        gotoxy(arquivos->posicao_submenus.X, arquivos->posicao_submenus.Y + i + ESPACAMENTO_INICIO_FINAL_OPCAO);
+        textcolor(BLACK);
+        textbackground(menu_config->cor7);
+        printf("|");
+    }
+
+    /*Coluna direita*/
+    for(i = 0; i < quantidade_submenus; i++)
+    {
+        gotoxy(arquivos->posicao_submenus.X + largura_janela_submenu + ESPACAMENTO_INICIO_FINAL_OPCAO + 1, arquivos->posicao_submenus.Y + i + ESPACAMENTO_INICIO_FINAL_OPCAO);
+        textcolor(BLACK);
+        textbackground(menu_config->cor7);
+        printf("|");
+    }
+
+    /*Linha inferior*/
+    for(i = 0; i < largura_janela_submenu + ESPACAMENTO_INICIO_FINAL_OPCAO * 2; i++)
+    {   
+        gotoxy(arquivos->posicao_submenus.X + i, arquivos->posicao_submenus.Y + quantidade_submenus + ESPACAMENTO_INICIO_FINAL_OPCAO);
+        textcolor(BLACK);
+        textbackground(menu_config->cor7);
+        printf("-");
+    }
+
+}
+
+/*Funcao que exibira os submenus*/
+void Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, int id_menu_principal)
+{
+    int i, quantidade_submenus = 0, largura_janela_submenu = 0;
+    int tamanho = 0, posicao = 0;
+
+    /*loop para pegar a string de maior tamanho, que servira como largura do desenho da minha janela*/
+    for(i = arquivos->cont_menu_principal; i < arquivos->cont_submenus + arquivos->cont_menu_principal; i++)
+    {
+        /*Verificacao para caso haja algum submenu na opcao selecionada do menu principal*/
+        if(menus[i]->id_pai == id_menu_principal)
+        {
+            /*Pego o tamanho da string atual*/
+            
+            tamanho = strlen(menus[i]->nome_menu);
+            
+            /*Verificacao da maior string para desenhar posteriormente o quadrado que acomodara os submenus*/
+            if(tamanho > largura_janela_submenu)
+            {
+                /*Achei o maior faco a troca*/
+                largura_janela_submenu = tamanho;
+            }
+
+            /*Incrementa minha quantidade de submenus para desenhar minha janela*/
+            quantidade_submenus++;
+        }
+    }
+    
+    /*Chama a funcao para desenhar minha janela de submenus*/
+    Desenha_Janela_submenus(menu_config, arquivos, quantidade_submenus, largura_janela_submenu);
+
+    /*Loop que percorre os submenus, o i comeca com a quantidade de menus principais contados ate a quantidade de menus como um todo*/
+    for(i = arquivos->cont_menu_principal; i < arquivos->cont_submenus + arquivos->cont_menu_principal; i++)
+    {
+        /*Verificacao para caso haja algum submenu na opcao selecionada do menu principal*/
+        if(menus[i]->id_pai == id_menu_principal)
+        {
+            /*Seta a posicao a ser impressa*/
+            gotoxy(arquivos->posicao_submenus.X + ESPACAMENTO_INICIO_FINAL_OPCAO, arquivos->posicao_submenus.Y + menu_config->altura/menu_config->largura + posicao + ESPACAMENTO_INICIO_FINAL_OPCAO);
+            printf("%s", menus[i]->nome_menu);
+            posicao++;
+        }
+    }
+}
+
+
 /*Funcao responsavel por exibir os menus*/
 void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos)
 {
@@ -492,24 +614,18 @@ void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arqu
                 /*Verificacao para navegacao e exibicao da selecao de um menu*/
                 if(arquivos->posicao_teclas_user == menus[i]->ordem)
                 {
+                    arquivos->posicao_submenus.X = wherex();
+                    arquivos->posicao_submenus.Y = wherey();
+
                     /*Cor de navegacao do menu principal*/
                     textcolor(BLUE);
 
                     /*Verifica se o enter foi pressionado ou nao de acordo com a posicao aonde o usuario esta*/
                     if(arquivos->enter_pressionado)
                     {
-
                         /*Representa a cor de texto e fundo da opcao selecionada*/
                         textcolor(menu_config->cor3);
-                        textbackground(menu_config->cor4);
-                        printf("%s", menus[i]->nome_menu);
-                        
-                        /*Cor da letra de atalho quando a opcao for selecionada*/
-                        gotoxy(menu_config->posicao_menu_principal.X + tamanho_nome_menu + index_letra_atalho, menu_config->posicao_menu_principal.Y);
-                        textcolor(menu_config->cor6);
-                        printf("%c", menus[i]->nome_menu[index_letra_atalho]);
-                        exit(0);
-                        
+                        textbackground(menu_config->cor4);       
                     }
                 }
 
@@ -519,9 +635,33 @@ void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arqu
                 /*Pego a posicao da primeira ocorrencia da letra de atalho*/
                 posicao_letra = strchr(menus[i]->nome_menu, menus[i]->letra_atalho);
                 index_letra_atalho = posicao_letra - menus[i]->nome_menu;
+
+                /*Seta o lugar da onde deve ser impresso os menu*/
                 gotoxy(menu_config->posicao_menu_principal.X + tamanho_nome_menu + index_letra_atalho, menu_config->posicao_menu_principal.Y);
-                textcolor(menu_config->cor5);
+
+                /*Verifico se o enter foi pressionado, caso foi, entra e chama a funcao correspondente*/
+                if(arquivos->enter_pressionado && arquivos->posicao_teclas_user == menus[i]->ordem)
+                {
+                    /*Cor da letra de atalho quando for selecionada*/
+                    textcolor(menu_config->cor6);
+                }
+                else
+                {
+                    /*Cor da letra de atalho quando nao esta selecionada a opcao*/
+                    textcolor(menu_config->cor5);
+                }
+                
+                /*Imprime a letra de atalho*/
                 printf("%c", menus[i]->nome_menu[index_letra_atalho]);
+
+                /*Caso o enter_pressionado ainda esta com o valor 1, entra nessa verificacao para chamar a funcao que imprimira os submenus*/
+                if(arquivos->enter_pressionado)
+                {
+                    /*Chamada da funcao para exibir os submenus, a posicao_teclas_user deve receber -1 pois seu valor varia,
+                    caso nao receba a impressao na hora da chamda da funcao saira errada*/
+                    Exibe_submenus(menus, menu_config, arquivos, menus[arquivos->posicao_teclas_user - 1]->id);
+                
+                }
 
                 /*Representa a cor da opcao nao selecionada de um menu*/
                 textcolor(menu_config->cor2);

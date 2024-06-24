@@ -5,7 +5,7 @@ escolher qualquer um por meio da tecla ENTER.
 
 Programador: Hugo Josue Lema Das Neves
 RGM: 47159 
-Data da Ultima modificacao: 12/06/2024*/
+Data da Ultima modificacao: 23/06/2024*/
 
 /*Copiar e colar no prompt de comando, apertar ENTER para executar
 gcc main.c -o main.exe console_v1.5.5.c conio_v3.2.4.c menu.c -Wall -pedantic -Wextra -Werror
@@ -14,12 +14,11 @@ gcc main.c -o main.exe console_v1.5.5.c conio_v3.2.4.c menu.c -Wall -pedantic -W
 /*Executavel gerado apos a linha de compilacao acima, copie, cole no terminal do cmd e execute apertando ENTER
 main.exe*/
 
-# include <stdio.h>
-# include <stdlib.h>
-# include <locale.h>
-# include "conio_v3.2.4.h"
-# include "console_v1.5.5.h"
-# include "funcoes.h"
+# include <locale.h> /*setlocale()*/
+# include <stdio.h> /*printf()*/
+# include "conio_v3.2.4.h" /*clrscr(), texbackground(), texcolor()*/
+# include "console_v1.5.5.h" /*setDimensaoJanela(), MaxDimensaJanela()*/
+# include "funcoes.h" /*Menu()*/
 
 /*Main principal do programa*/
 int main(int argc, char *argv[])
@@ -34,6 +33,7 @@ int main(int argc, char *argv[])
     argc = argc;
     argv = argv;
 
+    /*Mudanca de texto para nativo do sistema*/
     setlocale(LC_ALL, " ");
 
     /*Pega a dimensao maxima da janela e seta a janela atual*/
@@ -50,6 +50,5 @@ int main(int argc, char *argv[])
     textbackground(BLACK);
     printf("\nMain : %d", id_retorno);
 
-    
     return 0;
 }
