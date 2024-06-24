@@ -2,7 +2,7 @@
 
 /*Inclusao de bibliotecas*/
 # include <ctype.h> /*isdigit()*/
-# include <stdio.h> /*fclose(), fgetc(), fgets(), fopen(), fseek(), printf()*/
+# include <stdio.h> /*fclose(), fgetc(), fgets(), fopen(), fseek(), printf() putchar()*/
 # include <stdlib.h> /*atoi(), malloc(), free()*/
 # include <string.h> /*strchr(), strcpy(), strlen(), strtok() */
 # include "console_v1.5.5.h" /*Evento(), hit(), setCursorStatus()*/
@@ -192,6 +192,8 @@ int Menu(char *arquivo_menus, char *arquivo_cores)
     arquivos.cont_menu_principal = 0;
     arquivos.cont_submenus = 0;
     arquivos.controla_alt = 0;
+    arquivos.controla_impressao_submenus = 1;
+    arquivos.setas_submenus = 1;
     
     /*Desliga o cursor*/
     setCursorStatus(DESLIGAR);
@@ -375,6 +377,11 @@ void Desenha_Janela_Principal(MENU_CONFIG *menu_config, int tam_menus_desenhado)
 {
     int i, j;
 
+    /*Os caracteres representados por numeros dentro do putchar correspondem ao numero da tabela ascii code page 850
+    para caracteres especiais para desenhos de quadros, eles sao encontrados na ultima pagina.
+    https://www.comp.uems.br/~ricardo/PCII/Aulas/Arquivos%20%c3%bateis/Mat%c3%a9ria%200%20-%20Tabela%20ASCII/
+    */
+
     /*Desenha a janela toda*/
     for(i = 0; i < menu_config->altura; i++)
     {
@@ -397,25 +404,41 @@ void Desenha_Janela_Principal(MENU_CONFIG *menu_config, int tam_menus_desenhado)
         /*Cor da borda da janela e cor de fundo da borda da janela*/
         textcolor(menu_config->cor15);
         textbackground(menu_config->cor16);
-        printf("-");
+
+        /*Desenha o caractere de desenho para quadros*/
+        if(i == 0)
+        {
+            /*┌*/
+            putchar(218);
+        }
+
+        /*Imprime o caractere especial de desenho de quadros*/
+        if(i == tam_menus_desenhado - 1)
+        {
+            /*┐*/
+            putchar(191);
+            break;
+        }
+        
+        putchar(196);
     }
 
     /*Coluna esquerda*/
-    for(i = 0; i < menu_config->altura; i++)   
+    for(i = 0; i < menu_config->altura - 1; i++)   
     {
-        gotoxy(menu_config->posicao_menu_principal.X, menu_config->posicao_menu_principal.Y + menu_config->altura/menu_config->largura + i + 1);
+        gotoxy(menu_config->posicao_menu_principal.X, menu_config->posicao_menu_principal.Y + menu_config->altura/menu_config->largura + i + ESPACAMENTO_INICIO_FINAL_OPCAO);
         textcolor(menu_config->cor15);
         textbackground(menu_config->cor16);
-        printf("|");
+        putchar(179);
     }
 
     /*Coluna direita*/
-    for(i = 0; i < menu_config->altura; i++)
+    for(i = 0; i < menu_config->altura - 1; i++)
     {
-        gotoxy(tam_menus_desenhado, menu_config->posicao_menu_principal.Y + menu_config->altura/menu_config->largura + i + 1);
+        gotoxy(tam_menus_desenhado, menu_config->posicao_menu_principal.Y + menu_config->altura/menu_config->largura + i + ESPACAMENTO_INICIO_FINAL_OPCAO);
         textcolor(menu_config->cor15);
         textbackground(menu_config->cor16);
-        printf("|");
+        putchar(179);
     }
 
     /*Linha inferior*/
@@ -424,7 +447,23 @@ void Desenha_Janela_Principal(MENU_CONFIG *menu_config, int tam_menus_desenhado)
         gotoxy(menu_config->posicao_menu_principal.X + i, menu_config->posicao_menu_principal.Y + menu_config->altura/menu_config->largura + menu_config->altura + 1);
         textcolor(menu_config->cor15);
         textbackground(menu_config->cor16);
-        printf("-");
+
+        if(i == 0)
+        {
+            /*└*/
+            putchar(192);
+        }
+
+        /*Imprime ao atingir o final do loop o caractere especial*/
+        if(i == tam_menus_desenhado - 1)
+        {
+            /*┘*/
+            putchar(217);
+            break;
+        }
+        
+        /*Caractere especial para desenho de quadros (─)*/
+        putchar(196);
     }
     
 
@@ -472,16 +511,38 @@ void Desenha_Janela_submenus(MENU_CONFIG *menu_config, ARQUIVOS *arquivos, int q
         }
     }
 
+    /*Os caracteres representados por numeros dentro do putchar correspondem ao numero da tabela ascii code page 850
+    para caracteres especiais para desenhos de quadros, eles sao encontrados na ultima pagina.
+    https://www.comp.uems.br/~ricardo/PCII/Aulas/Arquivos%20%c3%bateis/Mat%c3%a9ria%200%20-%20Tabela%20ASCII/
+    */
+
     /*Linha superior*/
     for(i = 0; i < largura_janela_submenu + ESPACAMENTO_INICIO_FINAL_OPCAO * 2; i++)
     {
         /*Cor de fundo das janelas dos submenus*/
         gotoxy(arquivos->posicao_submenus.X + i, arquivos->posicao_submenus.Y + 1);
-        
+
         /*A cor do texto vai ser preta como padrao, pois no arquivo de consulta nao dizia se mudaria ou nao*/
         textcolor(BLACK);
         textbackground(menu_config->cor7);
-        printf("-");
+
+        /*Desenha o caractere de desenho para quadros*/
+        if(i == 0)
+        {
+            /*┌*/
+            putchar(218);
+        }
+
+        /*Imprime o caractere especial de desenho de quadros*/
+        if(i == largura_janela_submenu + ESPACAMENTO_INICIO_FINAL_OPCAO * 2 - 1)
+        {
+            /*┐*/
+            putchar(191);
+            break;
+        }
+        
+        /*Imprime o caractere especial para desenho de quadro (─)*/
+        putchar(196);
     }
 
     /*Coluna esquerda*/
@@ -490,7 +551,8 @@ void Desenha_Janela_submenus(MENU_CONFIG *menu_config, ARQUIVOS *arquivos, int q
         gotoxy(arquivos->posicao_submenus.X, arquivos->posicao_submenus.Y + i + ESPACAMENTO_INICIO_FINAL_OPCAO);
         textcolor(BLACK);
         textbackground(menu_config->cor7);
-        printf("|");
+        /*Caractere especial para desenho de quadros (│)*/
+        putchar(179);
     }
 
     /*Coluna direita*/
@@ -499,7 +561,8 @@ void Desenha_Janela_submenus(MENU_CONFIG *menu_config, ARQUIVOS *arquivos, int q
         gotoxy(arquivos->posicao_submenus.X + largura_janela_submenu + ESPACAMENTO_INICIO_FINAL_OPCAO + 1, arquivos->posicao_submenus.Y + i + ESPACAMENTO_INICIO_FINAL_OPCAO);
         textcolor(BLACK);
         textbackground(menu_config->cor7);
-        printf("|");
+        /*Caractere especial para desenho de quadros (│)*/
+        putchar(179);
     }
 
     /*Linha inferior*/
@@ -508,7 +571,23 @@ void Desenha_Janela_submenus(MENU_CONFIG *menu_config, ARQUIVOS *arquivos, int q
         gotoxy(arquivos->posicao_submenus.X + i, arquivos->posicao_submenus.Y + quantidade_submenus + ESPACAMENTO_INICIO_FINAL_OPCAO);
         textcolor(BLACK);
         textbackground(menu_config->cor7);
-        printf("-");
+
+        if(i == 0)
+        {
+            /*└*/
+            putchar(192);
+        }
+
+        /*Imprime ao atingir o final do loop o caractere especial*/
+        if(i == largura_janela_submenu + ESPACAMENTO_INICIO_FINAL_OPCAO * 2 - 1)
+        {
+            /*┘*/
+            putchar(217);
+            break;
+        }
+        
+        /*Caractere especial para desenho de quadros (─)*/
+        putchar(196);
     }
 
 }
@@ -518,44 +597,130 @@ void Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, 
 {
     int i, quantidade_submenus = 0, largura_janela_submenu = 0;
     int tamanho = 0, posicao = 0;
-
-    /*loop para pegar a string de maior tamanho, que servira como largura do desenho da minha janela*/
-    for(i = arquivos->cont_menu_principal; i < arquivos->cont_submenus + arquivos->cont_menu_principal; i++)
+    int saida = 1;
+    while(saida)
     {
-        /*Verificacao para caso haja algum submenu na opcao selecionada do menu principal*/
-        if(menus[i]->id_pai == id_menu_principal)
+        /*Controle para impressao dos submenus*/
+        if(arquivos->controla_impressao_submenus)
         {
-            /*Pego o tamanho da string atual*/
-            
-            tamanho = strlen(menus[i]->nome_menu);
-            
-            /*Verificacao da maior string para desenhar posteriormente o quadrado que acomodara os submenus*/
-            if(tamanho > largura_janela_submenu)
+            /*Como esta dentro de um loop infinito, eh necessario zerar a variavel para nao incrementar a quantidade de submenus novamente*/
+            quantidade_submenus = 0;
+
+            /*Posicao zera para posicionar corretamente meus submenus*/
+            posicao = 0;
+
+            /*loop para pegar a string de maior tamanho, que servira como largura do desenho da minha janela*/
+            for(i = arquivos->cont_menu_principal; i < arquivos->cont_submenus + arquivos->cont_menu_principal; i++)
             {
-                /*Achei o maior faco a troca*/
-                largura_janela_submenu = tamanho;
+                /*Verificacao para caso haja algum submenu na opcao selecionada do menu principal*/
+                if(menus[i]->id_pai == id_menu_principal)
+                {
+                    /*Pego o tamanho da string atual*/
+                    tamanho = strlen(menus[i]->nome_menu);
+                    
+                    /*Verificacao da maior string para desenhar posteriormente o quadrado que acomodara os submenus*/
+                    if(tamanho > largura_janela_submenu)
+                    {
+                        /*Achei o maior faco a troca*/
+                        largura_janela_submenu = tamanho;
+                    }
+
+                    /*Incrementa minha quantidade de submenus para desenhar minha janela*/
+                    quantidade_submenus++;
+                }
+            }
+            
+            /*Chama a funcao para desenhar minha janela de submenus*/
+            Desenha_Janela_submenus(menu_config, arquivos, quantidade_submenus, largura_janela_submenu);
+
+            /*Loop que percorre os submenus, o i comeca com a quantidade de menus principais contados ate a quantidade de menus como um todo*/
+            for(i = arquivos->cont_menu_principal; i < arquivos->cont_submenus + arquivos->cont_menu_principal; i++)
+            {
+                /*Verificacao para caso haja algum submenu na opcao selecionada do menu principal*/
+                if(menus[i]->id_pai == id_menu_principal)
+                {
+                    /*Seta a posicao a ser impressa*/
+                    gotoxy(arquivos->posicao_submenus.X + ESPACAMENTO_INICIO_FINAL_OPCAO, arquivos->posicao_submenus.Y + menu_config->altura/menu_config->largura + posicao + ESPACAMENTO_INICIO_FINAL_OPCAO);
+                    
+                    /*Verificacao para navegacao do submenu*/
+                    if(arquivos->setas_submenus == menus[i]->ordem)
+                    {
+                        /*Cor para saber aonde estou navegando no submenu*/
+                        textcolor(BLUE);
+                    }
+                    else
+                    {
+                        /*Cor das opcoes que nao foram selecionadas*/
+                        textcolor(menu_config->cor8);
+                    }
+                    
+                    printf("%s", menus[i]->nome_menu);
+                    posicao++;
+                }
             }
 
-            /*Incrementa minha quantidade de submenus para desenhar minha janela*/
-            quantidade_submenus++;
-        }
-    }
-    
-    /*Chama a funcao para desenhar minha janela de submenus*/
-    Desenha_Janela_submenus(menu_config, arquivos, quantidade_submenus, largura_janela_submenu);
+            /*Seta a 0 o controle de impressao novamente*/
+            arquivos->controla_impressao_submenus = 0;
 
-    /*Loop que percorre os submenus, o i comeca com a quantidade de menus principais contados ate a quantidade de menus como um todo*/
-    for(i = arquivos->cont_menu_principal; i < arquivos->cont_submenus + arquivos->cont_menu_principal; i++)
-    {
-        /*Verificacao para caso haja algum submenu na opcao selecionada do menu principal*/
-        if(menus[i]->id_pai == id_menu_principal)
-        {
-            /*Seta a posicao a ser impressa*/
-            gotoxy(arquivos->posicao_submenus.X + ESPACAMENTO_INICIO_FINAL_OPCAO, arquivos->posicao_submenus.Y + menu_config->altura/menu_config->largura + posicao + ESPACAMENTO_INICIO_FINAL_OPCAO);
-            printf("%s", menus[i]->nome_menu);
-            posicao++;
         }
+
+        /*Pega uma acao do teclado*/
+        if(hit(KEYBOARD_HIT))
+        {
+            /*Pega os eventos originarios do teclado e verifica pressionamento*/
+            arquivos->eventos_submenus = Evento();
+            if(arquivos->eventos_submenus.tipo_evento & KEY_EVENT)
+            {
+                if(arquivos->eventos_submenus.teclado.status_tecla == LIBERADA)
+                {
+                    switch(arquivos->eventos_submenus.teclado.key_code)
+                    {
+                        case ESC:
+                        {
+                            saida = 0;
+                            /*Quando o usuario sair do loop dos submenus, entrara no menu principal, para caso ele entre novamente no submenu eh
+                            necessario voltar o controlador de impressao de submenus para 1 e as setas tambem, justamente para que imprima novamente os submenus
+                            e seja possivel mostrar o local correto da navegacao no submenu*/
+                            arquivos->controla_impressao_submenus = 1;
+                            arquivos->setas_submenus = 1;
+                            break;
+                        }
+
+                        case SETA_PARA_BAIXO:
+                        {
+                            /*Verificacao para navegacao no submenu*/
+                            if(arquivos->setas_submenus < quantidade_submenus)
+                            {
+                                arquivos->setas_submenus++;
+                                arquivos->controla_impressao_submenus = 1;
+                            }
+                            break;
+                        }
+
+                        case SETA_PARA_CIMA:
+                        {
+                            /*Verificacao a-para navegacao so submenu para cima*/
+                            if(arquivos->setas_submenus > 1)
+                            {
+                                arquivos->setas_submenus--;
+                                arquivos->controla_impressao_submenus = 1;
+                            }
+                            break;
+                        }
+
+                        case ENTER:
+                        {
+                            /*Aonde a posicao das setas esta, significa o pai de um submenu,
+                            fazer esse percurso e chamar novamente a funcao para desenhar na janela*/
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
     }
+
 }
 
 
@@ -567,6 +732,7 @@ void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arqu
     int tamanho_nome_menu = 0;
     char *posicao_letra;
     int index_letra_atalho;
+    int saida = 1;
     
     /*Imprime os menus principais, id_pai == 0*/
     for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
@@ -660,6 +826,9 @@ void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arqu
                     /*Chamada da funcao para exibir os submenus, a posicao_teclas_user deve receber -1 pois seu valor varia,
                     caso nao receba a impressao na hora da chamda da funcao saira errada*/
                     Exibe_submenus(menus, menu_config, arquivos, menus[arquivos->posicao_teclas_user - 1]->id);
+
+                    /*Forca o i para sair do loop*/
+                    i = arquivos->cont_menu_principal;
                 
                 }
 
@@ -697,9 +866,7 @@ void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arqu
                         /*Saida temporaria do programa*/
                         case ESC:
                         {
-                            textbackground(BLACK);
-                            textcolor(LIGHTGRAY);
-                            exit(0);
+                            saida = 0;
                             break;
                         }
 
@@ -748,7 +915,7 @@ void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arqu
             }
         }
 
-    }while(1);
+    }while(saida);
     
     
 }

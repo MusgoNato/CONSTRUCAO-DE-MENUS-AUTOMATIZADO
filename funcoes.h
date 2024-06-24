@@ -51,6 +51,9 @@ typedef struct arquivos
     int controla_alt;
     int largura_dos_submenus;
     COORD posicao_submenus;
+    int controla_impressao_submenus;
+    EVENTO eventos_submenus;
+    int setas_submenus;
 
 }ARQUIVOS;
 
