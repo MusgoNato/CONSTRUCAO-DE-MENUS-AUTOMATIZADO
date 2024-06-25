@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     clrscr();
 
     /*Chamada da funcao Menu() para a criacao dos menus*/
-    id_retorno = Menu("asd.txt", "config.txt");
+    id_retorno = Menu("menu.txt", "config.txt");
       
     textcolor(LIGHTGRAY);
     textbackground(BLACK);

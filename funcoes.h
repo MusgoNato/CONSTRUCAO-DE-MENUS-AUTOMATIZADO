@@ -54,6 +54,11 @@ typedef struct arquivos
     int controla_impressao_submenus;
     EVENTO eventos_submenus;
     int setas_submenus;
+    int id_menu_anterior;
+
+    COORD limite_maximo_da_janela;
+    char *Tela;
+    int temp;
 
 }ARQUIVOS;
 

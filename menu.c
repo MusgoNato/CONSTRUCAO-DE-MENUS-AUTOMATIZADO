@@ -174,6 +174,18 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
     /*Se caso os dois arquivos, seus retornos sao diferente de NULL, significa que foram abertos corretamente*/
     if(arq_config != NULL && arq_menus != NULL)
     {
+        /*Aloco espaco para minha Tela de salvamento apos os arquivos serem abertos corretamente*/
+        arquivos->limite_maximo_da_janela = tamanhoJanelaConsole();
+
+        /*Alocacao da minha tela de salvamento*/
+        arquivos->Tela = (char *)malloc(arquivos->limite_maximo_da_janela.X * arquivos->limite_maximo_da_janela.Y * menu_config.espacamento * sizeof(char));
+        
+        /*Verificacao da alocacao se foi correta ou nao*/
+        if(arquivos->Tela == NULL)
+        {
+            printf("Erro na alocacao : tela de save!");
+        }
+
         /*Chamo a funcao para inicializar as estruturas*/
         Inicializa_estruturas_menus(menus, arquivos, &menu_config);
     }
@@ -194,6 +206,8 @@ int Menu(char *arquivo_menus, char *arquivo_cores)
     arquivos.controla_alt = 0;
     arquivos.controla_impressao_submenus = 1;
     arquivos.setas_submenus = 1;
+    arquivos.id_menu_anterior = -1;
+    arquivos.temp = 0;
     
     /*Desliga o cursor*/
     setCursorStatus(DESLIGAR);
@@ -598,6 +612,10 @@ void Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, 
     int i, quantidade_submenus = 0, largura_janela_submenu = 0;
     int tamanho = 0, posicao = 0;
     int saida = 1;
+
+    /*Variavel que recebera o indice atual da selecao de um submenu*/
+    int selecao_submenu = -1;
+
     while(saida)
     {
         /*Controle para impressao dos submenus*/
@@ -630,34 +648,51 @@ void Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, 
                 }
             }
             
-            /*Chama a funcao para desenhar minha janela de submenus*/
-            Desenha_Janela_submenus(menu_config, arquivos, quantidade_submenus, largura_janela_submenu);
-
-            /*Loop que percorre os submenus, o i comeca com a quantidade de menus principais contados ate a quantidade de menus como um todo*/
-            for(i = arquivos->cont_menu_principal; i < arquivos->cont_submenus + arquivos->cont_menu_principal; i++)
+            /*Caso haja submenus, desenha a janela e imprime as opcoes*/
+            if(quantidade_submenus > 0)
             {
-                /*Verificacao para caso haja algum submenu na opcao selecionada do menu principal*/
-                if(menus[i]->id_pai == id_menu_principal)
+                /*Chama a funcao para desenhar minha janela de submenus*/
+                Desenha_Janela_submenus(menu_config, arquivos, quantidade_submenus, largura_janela_submenu);
+
+                /*Loop que percorre os submenus, o i comeca com a quantidade de menus principais contados ate a quantidade de menus como um todo*/
+                for(i = arquivos->cont_menu_principal; i < arquivos->cont_submenus + arquivos->cont_menu_principal; i++)
                 {
-                    /*Seta a posicao a ser impressa*/
-                    gotoxy(arquivos->posicao_submenus.X + ESPACAMENTO_INICIO_FINAL_OPCAO, arquivos->posicao_submenus.Y + menu_config->altura/menu_config->largura + posicao + ESPACAMENTO_INICIO_FINAL_OPCAO);
-                    
-                    /*Verificacao para navegacao do submenu*/
-                    if(arquivos->setas_submenus == menus[i]->ordem)
+                    /*Verificacao para caso haja algum submenu na opcao selecionada do menu principal*/
+                    if(menus[i]->id_pai == id_menu_principal)
                     {
-                        /*Cor para saber aonde estou navegando no submenu*/
-                        textcolor(BLUE);
-                    }
-                    else
-                    {
-                        /*Cor das opcoes que nao foram selecionadas*/
+                        /*Seta a posicao a ser impressa*/
+                        gotoxy(arquivos->posicao_submenus.X + ESPACAMENTO_INICIO_FINAL_OPCAO, arquivos->posicao_submenus.Y + menu_config->altura/menu_config->largura + posicao + ESPACAMENTO_INICIO_FINAL_OPCAO);
+                        
+                        /*Verificacao para navegacao do submenu*/
+                        if(arquivos->setas_submenus == menus[i]->ordem)
+                        {
+                            /*Cor de fundo da opcao e texto de navegacao*/
+                            textcolor(menu_config->cor9);
+                            textbackground(menu_config->cor10);
+
+                            /*Ao estar em uma opcao, atribuo o valor para a variavel selecao_submenu, recebendo o indice atual*/
+                            selecao_submenu = i;
+
+                        }
+                        
+                        /*Imprime o submenu*/
+                        printf("%s", menus[i]->nome_menu);
+                        textbackground(menu_config->cor7);
                         textcolor(menu_config->cor8);
+                        posicao++;
                     }
-                    
-                    printf("%s", menus[i]->nome_menu);
-                    posicao++;
                 }
             }
+            else
+            {
+                /*Aqui vai ser a saida do programa para retornar o codigo correto do submenu*/
+                arquivos->controla_impressao = 1;
+                arquivos->setas_submenus = 1;
+                arquivos->id_menu_anterior = -1;
+                saida = 0;   
+                break;
+            }
+
 
             /*Seta a 0 o controle de impressao novamente*/
             arquivos->controla_impressao_submenus = 0;
@@ -677,12 +712,28 @@ void Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, 
                     {
                         case ESC:
                         {
-                            saida = 0;
-                            /*Quando o usuario sair do loop dos submenus, entrara no menu principal, para caso ele entre novamente no submenu eh
-                            necessario voltar o controlador de impressao de submenus para 1 e as setas tambem, justamente para que imprima novamente os submenus
-                            e seja possivel mostrar o local correto da navegacao no submenu*/
-                            arquivos->controla_impressao_submenus = 1;
-                            arquivos->setas_submenus = 1;
+                            /*Verificacao para caso haja algum menu guardado, para voltar a imprimi-lo novamente apos o pressionamento do ESC*/
+                            if(arquivos->id_menu_anterior != -1)
+                            {
+                                /*O menu a ser impresso recebe o id anterior guardado*/
+                                id_menu_principal = arquivos->id_menu_anterior;
+
+                                /*Reseta as variaveis de controle, navegacao e o proprio id anterior pego*/
+                                arquivos->controla_impressao_submenus = 1;
+                                arquivos->setas_submenus = 1;
+                                arquivos->id_menu_anterior = -1;
+                                
+                                
+                            }
+                            else
+                            {
+                                /*Quando o usuario sair do loop dos submenus, entrara no menu principal, para caso ele entre novamente no submenu eh
+                                necessario voltar o controlador de impressao de submenus para 1 e as setas tambem, justamente para que imprima novamente os submenus
+                                e seja possivel mostrar o local correto da navegacao no submenu*/
+                                arquivos->controla_impressao_submenus = 1;
+                                arquivos->setas_submenus = 1;
+                                saida = 0;
+                            }
                             break;
                         }
 
@@ -710,8 +761,31 @@ void Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, 
 
                         case ENTER:
                         {
-                            /*Aonde a posicao das setas esta, significa o pai de um submenu,
-                            fazer esse percurso e chamar novamente a funcao para desenhar na janela*/
+                            /*Verificacao para caso haja um submenu selecionado*/
+                            if(selecao_submenu != -1)
+                            {   
+                                /*Guardo o valor menu anterior impresso*/
+                                arquivos->id_menu_anterior = id_menu_principal;
+
+                                /*Id recebe o valor da aonde estou navegando*/
+                                id_menu_principal = menus[selecao_submenu]->id;
+
+                                /*Volta a imprimir novamente os submenus*/
+                                arquivos->controla_impressao_submenus = 1;
+                                arquivos->setas_submenus = 1;
+
+                                /*Pego o maior valor da string para imprimir minha outra janela*/
+                                arquivos->posicao_submenus.X += largura_janela_submenu;
+                                arquivos->posicao_submenus.Y += arquivos->setas_submenus;
+
+                                /*Chama novamente a funcao apra exibico de um novo submenu*/
+                                Exibe_submenus(menus, menu_config, arquivos, id_menu_principal);
+
+                                /*Volta a colocar o id que foi pego anteriormente antes da chamada da funcao para o id que sera impresso pela funcao*/
+                                id_menu_principal = arquivos->id_menu_anterior; 
+
+                            }
+                            
                             break;
                         }
                     }
@@ -783,16 +857,10 @@ void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arqu
                     arquivos->posicao_submenus.X = wherex();
                     arquivos->posicao_submenus.Y = wherey();
 
-                    /*Cor de navegacao do menu principal*/
-                    textcolor(BLUE);
+                    /*Representa a cor de texto e fundo da opcao selecionada*/
+                    textcolor(menu_config->cor3);
+                    textbackground(menu_config->cor4);       
 
-                    /*Verifica se o enter foi pressionado ou nao de acordo com a posicao aonde o usuario esta*/
-                    if(arquivos->enter_pressionado)
-                    {
-                        /*Representa a cor de texto e fundo da opcao selecionada*/
-                        textcolor(menu_config->cor3);
-                        textbackground(menu_config->cor4);       
-                    }
                 }
 
                 /*Imprime o menu*/
@@ -805,8 +873,8 @@ void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arqu
                 /*Seta o lugar da onde deve ser impresso os menu*/
                 gotoxy(menu_config->posicao_menu_principal.X + tamanho_nome_menu + index_letra_atalho, menu_config->posicao_menu_principal.Y);
 
-                /*Verifico se o enter foi pressionado, caso foi, entra e chama a funcao correspondente*/
-                if(arquivos->enter_pressionado && arquivos->posicao_teclas_user == menus[i]->ordem)
+                /*Verifica a posicao do usuario na navegacao do menu*/
+                if(arquivos->posicao_teclas_user == menus[i]->ordem)
                 {
                     /*Cor da letra de atalho quando for selecionada*/
                     textcolor(menu_config->cor6);
