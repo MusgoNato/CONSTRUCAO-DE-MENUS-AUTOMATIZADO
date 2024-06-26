@@ -177,14 +177,6 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
         /*Aloco espaco para minha Tela de salvamento apos os arquivos serem abertos corretamente*/
         arquivos->limite_maximo_da_janela = MaxDimensaoJanela();
 
-        /*Alocacao da minha tela de salvamento*/
-        arquivos->Tela = (char ***)malloc(arquivos->limite_maximo_da_janela.X * arquivos->limite_maximo_da_janela.Y * 2 *sizeof(char **));
-        
-        /*Verificacao da alocacao se foi correta ou nao*/
-        if(arquivos->Tela == NULL)
-        {
-            printf("Erro na alocacao : tela de save!");
-        }
 
         /*Chamo a funcao para inicializar as estruturas*/
         Inicializa_estruturas_menus(menus, arquivos, &menu_config);
@@ -370,6 +362,7 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
 void Contagem_menus_submenus(MENU **menus, ARQUIVOS *arquivos)
 {
     int i;
+
     for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
     {
         /*Caso seja pai*/
@@ -383,6 +376,42 @@ void Contagem_menus_submenus(MENU **menus, ARQUIVOS *arquivos)
             arquivos->cont_submenus++;
         }
     }
+
+    /*Aloca minha tela de save da janela do cmd*/
+    arquivos->Tela = (char **)malloc(arquivos->cont_submenus * sizeof(char *));
+    
+    /*Verificacao da alocacao se foi correta ou nao*/
+    if(arquivos->Tela == NULL)
+    {
+        printf("Erro na alocacao : tela de save!");
+        free(arquivos->Tela);
+    }
+
+    for(i = 0; i < arquivos->cont_submenus; i++)
+    {
+        arquivos->Tela[i] = (char *)malloc(arquivos->limite_maximo_da_janela.X * arquivos->limite_maximo_da_janela.Y * 2 * sizeof(char));
+    }
+
+    /*Alocacao da minha pilha*/
+    arquivos->Pilha = (int **)malloc(arquivos->cont_submenus * sizeof(int *));
+    
+    /*Verificacao da alocacao caso de certo*/
+    if(arquivos->Pilha != NULL)
+    {   
+        /*Alocacao para minhas posições*/
+        for(i = 0; i < arquivos->cont_submenus; i++)
+        {   
+            /*Aloco para cada ponteiro da minha piha o valor do tipo int*/
+            arquivos->Pilha[i] = (int *)malloc(sizeof(int));
+        }
+    }
+    else
+    {
+        /*Libera memoria alocada*/
+        free(arquivos->Pilha);
+    }
+
+    
 }
 
 /*Funcao responsavel por desenhar a janela principal*/
@@ -611,7 +640,6 @@ void Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, 
     int i, quantidade_submenus = 0, largura_janela_submenu = 0;
     int tamanho = 0, posicao = 0;
     int saida = 1;
-
     /*Variavel que recebera o indice atual da selecao de um submenu*/
     int selecao_submenu = -1;
 
@@ -640,13 +668,6 @@ void Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, 
                     {
                         /*Achei o maior faco a troca*/
                         largura_janela_submenu = tamanho;
-                    }
-
-                    /*Alocacao da tela de save para cada submenu*/
-                    if(arquivos->controla_save_tela)
-                    {
-                        /*Alocacao dinamica*/
-                        arquivos->Tela[quantidade_submenus] = (char **)malloc(arquivos->limite_maximo_da_janela.X * arquivos->limite_maximo_da_janela.Y * 2 * sizeof(char *));
                     }
 
                     /*Incrementa minha quantidade de submenus para desenhar minha janela*/
@@ -698,8 +719,8 @@ void Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, 
                 /*Aqui vai ser a saida do programa para retornar o codigo correto do submenu*/
                 arquivos->controla_impressao = 1;
                 arquivos->setas_submenus = 1;
-                arquivos->id_menu_anterior = -1;
-                saida = 0;   
+                arquivos->id_menu_anterior = id_menu_principal;   
+                arquivos->nivel--;
                 break;
             }
 
@@ -722,28 +743,12 @@ void Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, 
                     {
                         case ESC:
                         {
-                            /*Verificacao para caso haja algum menu guardado, para voltar a imprimi-lo novamente apos o pressionamento do ESC*/
-                            if(arquivos->id_menu_anterior != -1)
+                            if(arquivos->nivel > 0)
                             {
-                                /*O menu a ser impresso recebe o id anterior guardado
-                                id_menu_principal = arquivos->id_menu_anterior;*/
-
-                                /*Reseta as variaveis de controle, navegacao e o proprio id anterior pego*/
-                                arquivos->controla_impressao_submenus = 1;
-                                arquivos->setas_submenus = 1;
-
-                                /*Coloca o save da tela anterior novamente*/
-                                puttext(1, 1, arquivos->limite_maximo_da_janela.X, arquivos->limite_maximo_da_janela.Y, arquivos->Tela[0]);
+                                puttext(1, 1, arquivos->limite_maximo_da_janela.X, arquivos->limite_maximo_da_janela.Y, arquivos->Tela[--arquivos->nivel]);
                                 
-                            }
-                            else
-                            {
-                                /*Quando o usuario sair do loop dos submenus, entrara no menu principal, para caso ele entre novamente no submenu eh
-                                necessario voltar o controlador de impressao de submenus para 1 e as setas tambem, justamente para que imprima novamente os submenus
-                                e seja possivel mostrar o local correto da navegacao no submenu*/
-                                arquivos->controla_impressao_submenus = 1;
-                                arquivos->setas_submenus = 1;
-                                saida = 0;
+                                /*CRIAR UMA PILHA PARA COLOCAR OS IDS A CADA INCREMENTO*/
+                                id_menu_principal = arquivos->id_menu_anterior;
                             }
                             break;
                         }
@@ -772,12 +777,14 @@ void Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, 
 
                         case ENTER:
                         {
-                            /*Verificacao para caso haja um submenu selecionado*/
+                            /*Verificacao caso seja selecionado um submenu*/
                             if(selecao_submenu != -1)
-                            {   
-                                _gettext(1, 1, arquivos->limite_maximo_da_janela.X, arquivos->limite_maximo_da_janela.Y, arquivos->Tela[0]);
-
-                                /*Guardo o valor menu anterior impresso*/
+                            {
+                                /*Guarda a tela da janela atual*/
+                                _gettext(1, 1, arquivos->limite_maximo_da_janela.X, arquivos->limite_maximo_da_janela.Y, arquivos->Tela[arquivos->nivel]);
+                                arquivos->nivel++;
+                                
+                                /*Pego o id anterior, que servira para nao imprimir novamente meu id atual*/
                                 arquivos->id_menu_anterior = id_menu_principal;
 
                                 /*Id recebe o valor da aonde estou navegando*/
@@ -794,11 +801,9 @@ void Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, 
                                 /*Chama novamente a funcao apra exibico de um novo submenu*/
                                 Exibe_submenus(menus, menu_config, arquivos, id_menu_principal);
 
-                                /*Volta a colocar o id que foi pego anteriormente antes da chamada da funcao para o id que sera impresso pela funcao*/
-                                id_menu_principal = arquivos->id_menu_anterior; 
-
-                            }
-                            
+                                /*Recoloco o id anterior ao menu principal*/
+                                id_menu_principal = arquivos->id_menu_anterior;
+                            }     
                             break;
                         }
                     }
@@ -907,6 +912,7 @@ void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arqu
                     /*Chamada da funcao para exibir os submenus, a posicao_teclas_user deve receber -1 pois seu valor varia,
                     caso nao receba a impressao na hora da chamda da funcao saira errada*/
                     Exibe_submenus(menus, menu_config, arquivos, menus[arquivos->posicao_teclas_user - 1]->id);
+                    arquivos->nivel = 0;
 
                     /*Forca o i para sair do loop*/
                     i = arquivos->cont_menu_principal;
