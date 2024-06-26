@@ -57,8 +57,9 @@ typedef struct arquivos
     int id_menu_anterior;
 
     COORD limite_maximo_da_janela;
-    char *Tela;
-    int temp;
+    char ***Tela;
+    int controla_save_tela;
+    int nivel;
 
 }ARQUIVOS;
 

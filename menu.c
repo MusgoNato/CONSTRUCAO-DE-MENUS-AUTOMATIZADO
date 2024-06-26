@@ -175,10 +175,10 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
     if(arq_config != NULL && arq_menus != NULL)
     {
         /*Aloco espaco para minha Tela de salvamento apos os arquivos serem abertos corretamente*/
-        arquivos->limite_maximo_da_janela = tamanhoJanelaConsole();
+        arquivos->limite_maximo_da_janela = MaxDimensaoJanela();
 
         /*Alocacao da minha tela de salvamento*/
-        arquivos->Tela = (char *)malloc(arquivos->limite_maximo_da_janela.X * arquivos->limite_maximo_da_janela.Y * menu_config.espacamento * sizeof(char));
+        arquivos->Tela = (char ***)malloc(arquivos->limite_maximo_da_janela.X * arquivos->limite_maximo_da_janela.Y * 2 *sizeof(char **));
         
         /*Verificacao da alocacao se foi correta ou nao*/
         if(arquivos->Tela == NULL)
@@ -207,7 +207,8 @@ int Menu(char *arquivo_menus, char *arquivo_cores)
     arquivos.controla_impressao_submenus = 1;
     arquivos.setas_submenus = 1;
     arquivos.id_menu_anterior = -1;
-    arquivos.temp = 0;
+    arquivos.controla_save_tela = 1;
+    arquivos.nivel = 0;
     
     /*Desliga o cursor*/
     setCursorStatus(DESLIGAR);
@@ -261,7 +262,6 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
 
     menu_config->posicao_menu_principal.X = 1;
     menu_config->posicao_menu_principal.Y = 1;
-
 
 
     /*Esse loop mais externo percorre as linhas do meu arquivo menu.txt*/
@@ -352,7 +352,6 @@ void Inicializa_estruturas_menus(MENU **menus, ARQUIVOS *arquivos, MENU_CONFIG *
         delimitador = strtok(NULL, " ");        
         index_aux++;
     }
-
 
     /*Chamo a funcao para inicializar a estrutura contendo as variaveis para as cores do menu e suas configuracoes*/
     Inicializa_estrutura_cores(menu_config, vetor_aux);
@@ -643,10 +642,21 @@ void Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, 
                         largura_janela_submenu = tamanho;
                     }
 
+                    /*Alocacao da tela de save para cada submenu*/
+                    if(arquivos->controla_save_tela)
+                    {
+                        /*Alocacao dinamica*/
+                        arquivos->Tela[quantidade_submenus] = (char **)malloc(arquivos->limite_maximo_da_janela.X * arquivos->limite_maximo_da_janela.Y * 2 * sizeof(char *));
+                    }
+
                     /*Incrementa minha quantidade de submenus para desenhar minha janela*/
                     quantidade_submenus++;
+
                 }
             }
+
+            /*Reseta a variavel novamente, pois nao necessitarei novamente*/
+            arquivos->controla_save_tela = 0;
             
             /*Caso haja submenus, desenha a janela e imprime as opcoes*/
             if(quantidade_submenus > 0)
@@ -715,14 +725,15 @@ void Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, 
                             /*Verificacao para caso haja algum menu guardado, para voltar a imprimi-lo novamente apos o pressionamento do ESC*/
                             if(arquivos->id_menu_anterior != -1)
                             {
-                                /*O menu a ser impresso recebe o id anterior guardado*/
-                                id_menu_principal = arquivos->id_menu_anterior;
+                                /*O menu a ser impresso recebe o id anterior guardado
+                                id_menu_principal = arquivos->id_menu_anterior;*/
 
                                 /*Reseta as variaveis de controle, navegacao e o proprio id anterior pego*/
                                 arquivos->controla_impressao_submenus = 1;
                                 arquivos->setas_submenus = 1;
-                                arquivos->id_menu_anterior = -1;
-                                
+
+                                /*Coloca o save da tela anterior novamente*/
+                                puttext(1, 1, arquivos->limite_maximo_da_janela.X, arquivos->limite_maximo_da_janela.Y, arquivos->Tela[0]);
                                 
                             }
                             else
@@ -764,6 +775,8 @@ void Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, 
                             /*Verificacao para caso haja um submenu selecionado*/
                             if(selecao_submenu != -1)
                             {   
+                                _gettext(1, 1, arquivos->limite_maximo_da_janela.X, arquivos->limite_maximo_da_janela.Y, arquivos->Tela[0]);
+
                                 /*Guardo o valor menu anterior impresso*/
                                 arquivos->id_menu_anterior = id_menu_principal;
 
