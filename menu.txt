@@ -1,30 +1,47 @@
 4  7  1 "SubsubOpcao 1*" 1
-43 4  3 "Opcao 3 do Menu 'Arquivo*'" 3
+2 4  3 "Opcao 3 do Menu 'Arquivo*'" 3
 4  8  2 "SubsubOpcao 2" 2
 13 19 1 "SubT 1" 1
 10 12 2 "SubTeste* 2" 2
-2 13 2 "Opcao 2 do Menu 'Verificacao*'" 2
-0  2  2 "Verificacao" e
+43 13 2 "Opcao 2 do Menu 'Verificacao*'" 2
+0  5000  1 "Verificacao" e
 13 20 3 "SubT 3" 3
 7  10 2 "Teste 2*" 2
 10 11 1 "SubTeste 1" 1
 12 15 1 "Op 1 do SubMenu 'Verificacao'" 1
-43 3  1 "Opcao 1 do Menu 'Arquivo'*" 1
+2 3  1 "Opcao 1 do Menu 'Arquivo'*" 1
 12 17 3 "Op 3 do SubMenu 'Verificacao'" 3
-2  6  1 "Opcao 1 do Menu 'Verificacao'" 1
+43  6  1 "Opcao 1 do Menu 'Verificacao'*" 1
 
 12 16 2 "Op 2 do SubMenu 'Verificacao'" 2
 13 18 2 "SubT 2" 2
 
-2 14 3 "Opcao 3 do Menu 'Verificacao'" 3
+43 14 3 "Opcao 3 do Menu 'Verificacao'" 3
 
-43 5  2 "Opcao 2 do Menu 'Arquivo'" 2
+2 5  2 "Opcao 2 do Menu 'Arquivo'" 2
 7  9  1 "Teste 1" 1
-0  43 1 "Arquivo" A
+0  43 2 "Arquivo" A
 
-3 21  1 "Opcao 1 do Menu" 1
-3 22  2 "Opcao 1 do Menu " M
+37 21  1 "Opcao 1 do Menu" 1
+37 22  2 "Opcao 1 do Menu " M
+6  23  1 "SubsubOpcao 1" s
+6  24  2 "SubsubOpcao 2" u
+6  25  3 "SubsubOpcao 3" b
+6  26  4 "SubsubOpcao 4*" O
+26  27  1 "Subsub" u
+26  28  2 "Subsub*" S
+28  29  1 "Subsub" u
+28  30  2 "Subsub*3" S
+30  31  1 "Subsub" u
+30  32  2 "Subsub*" S
+32  33  1 "Subsub" u
+32  34  2 "Subsub*3" S
+5000 35  1 "Opcao 3 do Menu 'Arquivo*'" r
+5000 36  2 "Opcao 3 do Menu 'Arquivo*'" v
 
-0  23  3 "Verificacao" i
+5000 37  3 "Opcao 3 do Menu 'Arquivo*'" p
+5000 38  4 "Opcao 3 do Menu 'Arquivo*'" o
 
-
+37 39  3 "Opcao 1 do Menu" d
+37 40  4 "Opcao 1 do Menu" p
+37 41  5 "Opcao 1 do Menu" u

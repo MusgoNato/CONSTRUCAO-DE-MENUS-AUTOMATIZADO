@@ -66,6 +66,7 @@ typedef struct arquivos
     int retorno;
     char *Tela_menu_principal;
 
+
 }ARQUIVOS;
 
 typedef struct config
@@ -143,26 +144,74 @@ Retorno : Nenhum
 */
 void Abre_arquivos_e_aloca_memoria(char *, char *, ARQUIVOS *);
 
+
+/*Funcao responsavel por fazer a contagem de menus e submenus
+Parametros:
+1 -> 
+2 -> 
+Retorno : Nenhum
+*/
 void Contagem_menus_submenus(MENU **, ARQUIVOS *);
 
+/*Funcao responsavel por desenhar a janela principal dos menus
+Parametros:
+1 -> 
+2 -> 
+Retorno : Nenhum
+*/
 void Desenha_Janela_Principal(MENU_CONFIG *, int );
 
+/*Funcao responsavel por desenhar a janela dos submenus
+Parametros:
+1 -> 
+2 -> 
+3 ->
+4 ->
+Retorno : Nenhum*/
 void Desenha_Janela_submenus(MENU_CONFIG *, ARQUIVOS *, int, int);
 
-/*Funcao responsavel por exibir os submenus*/
+/*Funcao responsavel por exibir meus submenus
+Parametros:
+1 -> 
+2 -> 
+3 ->
+4 ->
+Retorno : Id retornado do submenu selecionado*/
 int Exibe_submenus(MENU **, MENU_CONFIG *, ARQUIVOS *, int);
 
-/*Funcao resposanvel por exibir os menus principais*/
+/*Funcao resposanvel por exibir os menus principais
+Parametros:
+1 ->
+2 -> 
+3 ->
+Retorno : Nenhum*/
 void Exibe_menu_principal(MENU **, MENU_CONFIG *, ARQUIVOS *);
 
-/*Funcao responsavel por inicializar estruturas da configuracao do menu, cores, espacamento, largura, etc*/
+/*Funcao responsavel por inicializar estruturas da configuracao do menu, cores, espacamento, largura, etc
+Parametros:
+1 -> 
+2 ->
+Retorno : Nenhum*/
 void Inicializa_estrutura_cores(MENU_CONFIG *, int []);
 
-/*Funcao para inicializar estrutura contendo os menus*/
+/*Funcao para inicializar estrutura contendo os menus
+Parametros:
+1 ->
+2 ->
+3 ->
+Retorno : Nenhum*/
 void Inicializa_estruturas_menus(MENU **, ARQUIVOS *,  MENU_CONFIG *);
 
-/*Funcao responsavel por criar meus menus de acordo com os arquivos passados como argumento*/
+/*Funcao responsavel por criar meus menus de acordo com os arquivos passados como argumento
+Parametros:
+1 ->
+2 ->
+Retorno : Numero id do ultimo menu selecionado pelo usuario*/
 int Menu(char *, char *);
 
-/*Funcao responsavel por exibir o menu principal*/
+/*Funcao responsavel por ordenar os menus, tanto os id pai quanto a ordem de cada menu em relacao ao outro
+Parametros:
+1 ->
+2 ->
+Retorno : Nenhum*/
 void Ordena_menus(MENU **, ARQUIVOS *);
