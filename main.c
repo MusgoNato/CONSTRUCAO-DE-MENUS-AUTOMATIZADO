@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
       
     textcolor(LIGHTGRAY);
     textbackground(BLACK);
-    printf("\nMain : %d", id_retorno);
+    printf("\nID DO MENU: %d", id_retorno);
 
     return 0;
 }

@@ -61,7 +61,10 @@ typedef struct arquivos
     int controla_save_tela;
     int nivel;
     int submenu_encontrado;
-    int **Pilha;
+    int *Pilha;
+    int index_pilha;
+    int retorno;
+    char *Tela_menu_principal;
 
 }ARQUIVOS;
 
@@ -147,7 +150,7 @@ void Desenha_Janela_Principal(MENU_CONFIG *, int );
 void Desenha_Janela_submenus(MENU_CONFIG *, ARQUIVOS *, int, int);
 
 /*Funcao responsavel por exibir os submenus*/
-void Exibe_submenus(MENU **, MENU_CONFIG *, ARQUIVOS *, int);
+int Exibe_submenus(MENU **, MENU_CONFIG *, ARQUIVOS *, int);
 
 /*Funcao resposanvel por exibir os menus principais*/
 void Exibe_menu_principal(MENU **, MENU_CONFIG *, ARQUIVOS *);

@@ -195,12 +195,12 @@ int Menu(char *arquivo_menus, char *arquivo_cores)
     arquivos.enter_pressionado = 0;
     arquivos.cont_menu_principal = 0;
     arquivos.cont_submenus = 0;
-    arquivos.controla_alt = 0;
     arquivos.controla_impressao_submenus = 1;
     arquivos.setas_submenus = 1;
-    arquivos.id_menu_anterior = -1;
     arquivos.controla_save_tela = 1;
     arquivos.nivel = 0;
+    arquivos.index_pilha = 0;
+    arquivos.retorno = 0;
     
     /*Desliga o cursor*/
     setCursorStatus(DESLIGAR);
@@ -213,7 +213,7 @@ int Menu(char *arquivo_menus, char *arquivo_cores)
     textcolor(LIGHTGRAY);
     textbackground(BLACK);
 
-    return 1;
+    return arquivos.retorno;
 }
 
 /*Inicializa a estrutura contendo as configuracoes do menu*/
@@ -377,23 +377,37 @@ void Contagem_menus_submenus(MENU **menus, ARQUIVOS *arquivos)
         }
     }
 
+    /*Alocacao da minha tela de save para o menu principal*/
+    arquivos->Tela_menu_principal = (char *)malloc(arquivos->limite_maximo_da_janela.X * arquivos->limite_maximo_da_janela.Y * 2 * sizeof(char));
+
+    /*Liberacao de memoria caso de errado a alocacao*/
+    if(arquivos->Tela_menu_principal == NULL)
+    {
+        free(arquivos->Tela_menu_principal);
+    }
+
     /*Aloca minha tela de save da janela do cmd*/
     arquivos->Tela = (char **)malloc(arquivos->cont_submenus * sizeof(char *));
     
     /*Verificacao da alocacao se foi correta ou nao*/
     if(arquivos->Tela == NULL)
     {
-        printf("Erro na alocacao : tela de save!");
+        /*Libera a memoria alocada*/
         free(arquivos->Tela);
     }
-
-    for(i = 0; i < arquivos->cont_submenus; i++)
+    else
     {
-        arquivos->Tela[i] = (char *)malloc(arquivos->limite_maximo_da_janela.X * arquivos->limite_maximo_da_janela.Y * 2 * sizeof(char));
+        /*Inicializaocao para minhas telas*/
+        for(i = 0; i < arquivos->cont_submenus; i++)
+        {
+            arquivos->Tela[i] = (char *)malloc(arquivos->limite_maximo_da_janela.X * arquivos->limite_maximo_da_janela.Y * 2 * sizeof(char));
+        }
     }
 
+    
+
     /*Alocacao da minha pilha*/
-    arquivos->Pilha = (int **)malloc(arquivos->cont_submenus * sizeof(int *));
+    arquivos->Pilha = (int *)malloc(arquivos->cont_submenus * sizeof(int));
     
     /*Verificacao da alocacao caso de certo*/
     if(arquivos->Pilha != NULL)
@@ -402,7 +416,7 @@ void Contagem_menus_submenus(MENU **menus, ARQUIVOS *arquivos)
         for(i = 0; i < arquivos->cont_submenus; i++)
         {   
             /*Aloco para cada ponteiro da minha piha o valor do tipo int*/
-            arquivos->Pilha[i] = (int *)malloc(sizeof(int));
+            arquivos->Pilha[i] = (int)malloc(sizeof(int));
         }
     }
     else
@@ -635,13 +649,16 @@ void Desenha_Janela_submenus(MENU_CONFIG *menu_config, ARQUIVOS *arquivos, int q
 }
 
 /*Funcao que exibira os submenus*/
-void Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, int id_menu_principal)
+int Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, int id_menu_principal)
 {
     int i, quantidade_submenus = 0, largura_janela_submenu = 0;
     int tamanho = 0, posicao = 0;
     int saida = 1;
     /*Variavel que recebera o indice atual da selecao de um submenu*/
     int selecao_submenu = -1;
+    /*char caractere_atalho;*/
+    char *posicao_atalho;
+    int indice_letra_atalho;
 
     while(saida)
     {
@@ -691,6 +708,7 @@ void Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, 
                     /*Verificacao para caso haja algum submenu na opcao selecionada do menu principal*/
                     if(menus[i]->id_pai == id_menu_principal)
                     {
+
                         /*Seta a posicao a ser impressa*/
                         gotoxy(arquivos->posicao_submenus.X + ESPACAMENTO_INICIO_FINAL_OPCAO, arquivos->posicao_submenus.Y + menu_config->altura/menu_config->largura + posicao + ESPACAMENTO_INICIO_FINAL_OPCAO);
                         
@@ -705,11 +723,38 @@ void Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, 
                             selecao_submenu = i;
 
                         }
+                        else
+                        {
+                            /*Opcao nao selecionada de um submenu*/
+                            textcolor(menu_config->cor8);
+                        }
                         
                         /*Imprime o submenu*/
                         printf("%s", menus[i]->nome_menu);
+
+                        /*Pego a posicao da primeira ocorrencia da letra de atalho*/
+                        posicao_atalho = strchr(menus[i]->nome_menu, menus[i]->letra_atalho);
+                        indice_letra_atalho = posicao_atalho - menus[i]->nome_menu;
+
+                        /*Seta a coordenada para a imressao da minha letra de atalho*/
+                        gotoxy(arquivos->posicao_submenus.X + ESPACAMENTO_INICIO_FINAL_OPCAO + indice_letra_atalho, arquivos->posicao_submenus.Y + menu_config->altura/menu_config->largura + posicao + ESPACAMENTO_INICIO_FINAL_OPCAO);
+
+                        if(arquivos->setas_submenus == menus[i]->ordem)
+                        {
+                            /*Letra de atalho selecionada*/
+                            textcolor(menu_config->cor12);
+                        }
+                        else
+                        {
+                            /*Letra de atalho nao selecionada*/
+                            textcolor(menu_config->cor11);
+                        }
+                        
+                        /*Imprime a letra de atalho*/
+                        printf("%c", menus[i]->nome_menu[indice_letra_atalho]);
+
+                        /*Cor de fundo da janela do submenu, caso nao coloque, o fundo da selecao de um submenu continua e fica ruim visualmente*/
                         textbackground(menu_config->cor7);
-                        textcolor(menu_config->cor8);
                         posicao++;
                     }
                 }
@@ -719,7 +764,11 @@ void Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, 
                 /*Aqui vai ser a saida do programa para retornar o codigo correto do submenu*/
                 arquivos->controla_impressao = 1;
                 arquivos->setas_submenus = 1;
-                arquivos->id_menu_anterior = id_menu_principal;   
+
+                /*Faco minha pilha de ids receber o menu atual que foi impresso*/
+                arquivos->Pilha[arquivos->index_pilha] = id_menu_principal;   
+
+                /*Decremento o nivel*/
                 arquivos->nivel--;
                 break;
             }
@@ -743,12 +792,22 @@ void Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, 
                     {
                         case ESC:
                         {
+                            /*Verifico o nivel onde estou*/
                             if(arquivos->nivel > 0)
                             {
+                                /*Coloco o save da minha ultima janela salva*/
                                 puttext(1, 1, arquivos->limite_maximo_da_janela.X, arquivos->limite_maximo_da_janela.Y, arquivos->Tela[--arquivos->nivel]);
-                                
-                                /*CRIAR UMA PILHA PARA COLOCAR OS IDS A CADA INCREMENTO*/
-                                id_menu_principal = arquivos->id_menu_anterior;
+
+                                /*O id do menu a ser impresso agora recebe uma posição anterior ao do meu vetor de ids*/
+                                id_menu_principal = arquivos->Pilha[--arquivos->index_pilha];
+
+                                /*Zero tanto as setas de controle de navegação e imprimo meu menu novamente*/
+                                arquivos->setas_submenus = 1;
+                                arquivos->controla_impressao_submenus = 1;
+                            }
+                            else
+                            {
+                                saida = 0;
                             }
                             break;
                         }
@@ -783,9 +842,12 @@ void Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, 
                                 /*Guarda a tela da janela atual*/
                                 _gettext(1, 1, arquivos->limite_maximo_da_janela.X, arquivos->limite_maximo_da_janela.Y, arquivos->Tela[arquivos->nivel]);
                                 arquivos->nivel++;
-                                
-                                /*Pego o id anterior, que servira para nao imprimir novamente meu id atual*/
-                                arquivos->id_menu_anterior = id_menu_principal;
+
+                                /*O id principal vai para meu vetor de ids*/
+                                arquivos->Pilha[arquivos->index_pilha] = id_menu_principal;
+
+                                /*Incremento o indice do vetor*/
+                                arquivos->index_pilha++;
 
                                 /*Id recebe o valor da aonde estou navegando*/
                                 id_menu_principal = menus[selecao_submenu]->id;
@@ -793,25 +855,38 @@ void Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, 
                                 /*Volta a imprimir novamente os submenus*/
                                 arquivos->controla_impressao_submenus = 1;
                                 arquivos->setas_submenus = 1;
-
-                                /*Pego o maior valor da string para imprimir minha outra janela*/
-                                arquivos->posicao_submenus.X += largura_janela_submenu;
-                                arquivos->posicao_submenus.Y += arquivos->setas_submenus;
+                                
+                                /*ARRUMAR ESSA PARTE PARA QUE SEJA VARIAS COORDENADAS INDEPENDENTES*/
+                                tamanho = strlen(menus[selecao_submenu]->nome_menu) + ESPACAMENTO_INICIO_FINAL_OPCAO;
+                                arquivos->posicao_submenus.X += tamanho;
+                                arquivos->posicao_submenus.Y += menus[selecao_submenu]->ordem;
 
                                 /*Chama novamente a funcao apra exibico de um novo submenu*/
                                 Exibe_submenus(menus, menu_config, arquivos, id_menu_principal);
 
                                 /*Recoloco o id anterior ao menu principal*/
-                                id_menu_principal = arquivos->id_menu_anterior;
+                                id_menu_principal = arquivos->Pilha[arquivos->index_pilha];
                             }     
                             break;
                         }
+                    }
+                }
+                else
+                {
+                    /*Verificacao do pressionamento do alt*/
+                    if(arquivos->eventos_submenus.teclado.status_teclas_controle & ALT_ESQUERDO)
+                    {
+                        /*Pego o caractere de atalho
+                        caractere_atalho = arquivos->eventos_submenus.teclado.ascii_code;*/
                     }
                 }
             }
         }
         
     }
+
+    /*Retorna o ultimo menu selecionado*/
+    return id_menu_principal;
 
 }
 
@@ -825,6 +900,7 @@ void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arqu
     char *posicao_letra;
     int index_letra_atalho;
     int saida = 1;
+    char atalho_menu;
     
     /*Imprime os menus principais, id_pai == 0*/
     for(i = 0; i < arquivos->conta_linhas_arquivo; i++)
@@ -866,12 +942,24 @@ void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arqu
             /*For para percorrer os menus principais*/
             for(i = 0; i < arquivos->cont_menu_principal; i++)
             {
+                /*Verificacao caso usuario aperte uma letra de atalho*/
+                if(atalho_menu == menus[i]->letra_atalho)
+                {   
+                    arquivos->enter_pressionado = 1;
+                    arquivos->posicao_teclas_user = menus[i]->ordem;
+                    
+                    /*Pego a coordenada do menu atual para impressao correta do submenu*/
+                    arquivos->posicao_submenus.X = wherex();
+                    arquivos->posicao_submenus.Y = wherey();
+                }
+
                 /*Seta o lugar de impressao*/
                 gotoxy(menu_config->posicao_menu_principal.X + tamanho_nome_menu, menu_config->posicao_menu_principal.Y);
 
                 /*Verificacao para navegacao e exibicao da selecao de um menu*/
                 if(arquivos->posicao_teclas_user == menus[i]->ordem)
                 {
+                    /*Pego a coordenada do menu atual caso o usuario pressione o enter, diferente da tecla alt*/
                     arquivos->posicao_submenus.X = wherex();
                     arquivos->posicao_submenus.Y = wherey();
 
@@ -902,7 +990,7 @@ void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arqu
                     /*Cor da letra de atalho quando nao esta selecionada a opcao*/
                     textcolor(menu_config->cor5);
                 }
-                
+
                 /*Imprime a letra de atalho*/
                 printf("%c", menus[i]->nome_menu[index_letra_atalho]);
 
@@ -910,9 +998,12 @@ void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arqu
                 if(arquivos->enter_pressionado)
                 {
                     /*Chamada da funcao para exibir os submenus, a posicao_teclas_user deve receber -1 pois seu valor varia,
-                    caso nao receba a impressao na hora da chamda da funcao saira errada*/
-                    Exibe_submenus(menus, menu_config, arquivos, menus[arquivos->posicao_teclas_user - 1]->id);
+                    caso nao receba a impressao na hora da chamada da funcao saira errada*/
+                    arquivos->retorno = Exibe_submenus(menus, menu_config, arquivos, menus[arquivos->posicao_teclas_user - 1]->id);
                     arquivos->nivel = 0;
+                    arquivos->index_pilha = 0;
+                    arquivos->controla_alt = 0;
+                    saida = 0;
 
                     /*Forca o i para sair do loop*/
                     i = arquivos->cont_menu_principal;
@@ -991,12 +1082,14 @@ void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arqu
                 }
                 else
                 {
+                    /*Verifica se eh o alt esquerdo sendo pressionado*/
                     if(arquivos->teclas_evento.teclado.status_teclas_controle & ALT_ESQUERDO)
                     {
-                        arquivos->controla_alt = 1;
+                        /*Pego a proxima tecla a ser presionada, para verificacao dos menus*/
+                        atalho_menu = arquivos->teclas_evento.teclado.ascii_code;
 
-                        /*Pego a proxima tecla a ser presionada, para verificacao dos menus
-                        atalho_menu = arquivos->teclas_evento.teclado.ascii_code;*/
+                        /*Volto a imprimir meu menu*/
+                        arquivos->controla_impressao = 1;
                     }
                 }
             }
