@@ -31,6 +31,11 @@ typedef struct menus_programa
     COORD posicao_menu;
 }MENU;
 
+typedef struct coordenadas
+{
+    COORD coordenadas_para_sub;
+}COORDENADAS;
+
 typedef struct arquivos
 {
     /*Contem meus arquivos em matrizes*/
@@ -65,6 +70,7 @@ typedef struct arquivos
     int index_pilha;
     int retorno;
     char *Tela_menu_principal;
+    COORDENADAS *coordenadas_submenus;
 
 
 }ARQUIVOS;

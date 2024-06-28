@@ -424,6 +424,7 @@ void Contagem_menus_submenus(MENU **menus, ARQUIVOS *arquivos)
         /*Libera memoria alocada*/
         free(arquivos->Pilha);
     }
+    
 
     
 }
@@ -729,6 +730,7 @@ int Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, i
                             textcolor(menu_config->cor8);
                         }
                         
+
                         /*Imprime o submenu*/
                         printf("%s", menus[i]->nome_menu);
 
@@ -1005,7 +1007,7 @@ void Exibe_menu_principal(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arqu
                     arquivos->controla_alt = 0;
                     saida = 0;
 
-                    /*Forca o i para sair do loop*/
+                    /*Forca o i para sair do loop*/ 
                     i = arquivos->cont_menu_principal;
                 
                 }
