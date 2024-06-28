@@ -1,11 +1,14 @@
 /*Programa: Construcao de Menus
-Descri‡Æo: Programa sera capaz de construir menus com base em 2 arquivos .txt, 1ø armazena a quantidade de menus e submenus que o programa criara
-e o 2ø as cores dos respectivos menus e submenus, cores de texto e fundo. O usuario podera navegar nesses menus com as setas de direcao e tambem podera
-escolher qualquer um por meio da tecla ENTER.
+Descri‡Æo: O programa tera 2 arquivos de entrada, um sendo o arquivo contendo os menus que serao impressos, outro sendo as configuracoes referente aos menus
+no primeiro arquivo, o programa sera capaz de criar uma quantidade infinita de menus. O usuario tera podera navegar nas opcoes de um menu ou submenu usando as setas direcionais,
+setas a direita e esquerda somente podera navegar naqueles menus que sao pais principais, exibidos na horizontal do programa, e as setas baixo e cima nos submenus
+abertos, exibidos na vertical abaixo do menu pai principal. O usuario podera pressionar ENTER em uma opcao para abri seu submenu ou ESC para voltar ao menu anterior. no programa 
+as letras de atalho coloridas em cada opcao de acordo com a cor no arquivo passado como segundo parametro para a funcao, serao letras de atalho onde o usuario podera pressionar a tecla
+ALT + 'letra de atalho de alguma opcao', assim o usuario entrara em algum submenu atraves de atalhos caso haja algum.
 
 Programador: Hugo Josue Lema Das Neves
 RGM: 47159 
-Data da Ultima modificacao: 23/06/2024*/
+Data da Ultima modificacao: 28/06/2024*/
 
 /*Copiar e colar no prompt de comando, apertar ENTER para executar
 gcc main.c -o main.exe console_v1.5.5.c conio_v3.2.4.c menu.c -Wall -pedantic -Wextra -Werror
@@ -45,9 +48,12 @@ int main(int argc, char *argv[])
 
     /*Chamada da funcao Menu() para a criacao dos menus*/
     id_retorno = Menu("menu.txt", "config.txt");
-      
+
+    /*Retorna a cor original do cmd*/
     textcolor(LIGHTGRAY);
     textbackground(BLACK);
+
+    /*imprime o ultimo id*/
     printf("\nID DO MENU: %d", id_retorno);
 
     return 0;
