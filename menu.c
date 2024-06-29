@@ -8,7 +8,7 @@
 # include "console_v1.5.5.h" /*Evento(), hit(), setCursorStatus()*/
 # include "conio_v3.2.4.h" /*gotoxy(), texbackground(), texcolor(), wherexy()*/
 # include "funcoes.h" /*Abre_arquivos_e_aloca_memoria(), Contagem_menus_submenus(), Desenha_Janela_Principal(), Desenha_Janela_submenus(),
-Exibe_menu_principal(), Exibe_submenus(), Inicializa_estrutura_cores(), Inicializa_estruturas_menus(), Menu(), Ordena_menus()*/
+Exibe_menu_principal(), Exibe_submenus(), Inicializa_estrutura_cores(), Inicializa_estruturas_menus(), Inicializa_variaveis_diversas(), Menu(), Ordena_menus()*/
 
 /*Funcao responsavel por ler os arquivos passados como parametros na funcao Menu()*/
 void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQUIVOS *arquivos)
@@ -182,7 +182,7 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
     }
 }
 
-/*Funcao responsavel por contar a quantidade de menus e submenus*/
+/*Funcao responsavel por contar a quantidade de menus e submenus e fazer algumas alocacoes com base nessas contagens*/
 void Contagem_menus_submenus(MENU **menus, ARQUIVOS *arquivos)
 {
     int i;
@@ -687,10 +687,10 @@ int Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, i
     int tamanho = 0, posicao = 0;
     int saida = 1;
 
-    /*Variavel que recebera o indice atual da selecao de um submenu*/
+    /*Variavel que recebera o indice atual da selecao de um submenu, inicia com -1 pois nao foi selecionado nenhuma opcao*/
     int selecao_submenu = -1;
 
-    /*char caractere_atalho;*/
+    char caractere_atalho;
     char *posicao_atalho;
     int indice_letra_atalho;
 
@@ -791,7 +791,7 @@ int Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, i
             }
             else
             {
-                /*Faco minha pilha de ids receber o menu atual que foi impresso*/
+                /*Faco meu vetor de ids receber o menu atual que foi impresso*/
                 arquivos->vetor_ids_coord_sub[arquivos->index_vetor]->id_submenu = id_menu_principal;   
 
                 /*Decremento o nivel*/
@@ -911,8 +911,9 @@ int Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, i
                     /*Verificacao do pressionamento do alt*/
                     if(arquivos->eventos_submenus.teclado.status_teclas_controle & ALT_ESQUERDO)
                     {
-                        /*Pego o caractere de atalho
-                        caractere_atalho = arquivos->eventos_submenus.teclado.ascii_code;*/
+                        /*Pego o caractere de atalho*/
+                        caractere_atalho = arquivos->eventos_submenus.teclado.ascii_code;
+                        
                     }
                 }
             }
