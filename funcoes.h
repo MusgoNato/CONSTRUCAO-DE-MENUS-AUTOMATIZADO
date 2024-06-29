@@ -1,7 +1,7 @@
 /*Prototipos de funcoes e declaracoes de constantes*/
 
 /*Constantes*/
-# define TAM_OPCAO_MENU 35
+# define TAM_OPCAO_MENU 30
 # define TAM_BUFFER 100
 # define TAM_LINHA_CONFIG 100
 # define TAM_VETOR_MENU_CONFIG 20 

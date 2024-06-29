@@ -6,9 +6,11 @@ abertos, exibidos na vertical abaixo do menu pai principal. O usuario podera pre
 as letras de atalho coloridas em cada opcao de acordo com a cor no arquivo passado como segundo parametro para a funcao, serao letras de atalho onde o usuario podera pressionar a tecla
 ALT + 'letra de atalho de alguma opcao', assim o usuario entrara em algum submenu atraves de atalhos caso haja algum.
 
+NOTA : O programa suporta a opcao ate no maximo 30 caracteres, caso adicione uma opcao com mais de 30 caracteres nao funcionara corretamente*
+
 Programador: Hugo Josue Lema Das Neves
 RGM: 47159 
-Data da Ultima modificacao: 28/06/2024*/
+Data da Ultima modificacao: 29/06/2024*/
 
 /*Copiar e colar no prompt de comando, apertar ENTER para executar
 gcc main.c -o main.exe console_v1.5.5.c conio_v3.2.4.c menu.c -Wall -pedantic -Wextra -Werror

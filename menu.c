@@ -690,7 +690,7 @@ int Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, i
     /*Variavel que recebera o indice atual da selecao de um submenu, inicia com -1 pois nao foi selecionado nenhuma opcao*/
     int selecao_submenu = -1;
 
-    char caractere_atalho;
+    /*char caractere_atalho;*/
     char *posicao_atalho;
     int indice_letra_atalho;
 
@@ -908,13 +908,11 @@ int Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, i
                 }
                 else
                 {
-                    /*Verificacao do pressionamento do alt*/
+                    /*Verificacao do pressionamento do alt
                     if(arquivos->eventos_submenus.teclado.status_teclas_controle & ALT_ESQUERDO)
                     {
-                        /*Pego o caractere de atalho*/
-                        caractere_atalho = arquivos->eventos_submenus.teclado.ascii_code;
                         
-                    }
+                    }*/
                 }
             }
         }
