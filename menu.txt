@@ -1,8 +1,20 @@
-0 1 2 "Arquivo" A
-0 2 1 "Verificaá∆o" e
-1 3 1 "Opá∆o 1 do Menu 'Arquivossa'" 1
-1 4 3 "Opá∆o 3 do Menu 'Arquivo'" 3
-1 5 2 "Opá∆o 2 do Menu 'Arquivo'" 2
-2 6 1 "Opá∆o 1 do Menu 'Verificaá∆o'" 1
-4 7 1 "SubsubOpcao 1" 1
-4 8 2 "SubsubOpcao 2" 2
+0 1 1 "Arquivo" A
+0 2 2 "Salvar" S
+0 23 3 "Gastos" G
+1 3 1 "Dados pessoais" D
+1 4 3 "Alimentaá∆o" A
+1 5 2 "Investimentos" I
+2 6 1 "ARQUIVOS" Q
+6 7 1 "DADOS PESSOAIS" D
+6 8 2 "INVESTIMENTOS" I
+6 9 3 "ALIMENTAÄ«O" A
+4 10 1 "Adicionar refeiá∆o" i
+4 11 2 "Adicionar bebida" b
+4 12 3 "Calorias totais" C
+5 13 1 "CDB" C
+5 14 2 "Aá‰es" s
+5 15 3 "Poupanáa" P
+5 16 4 "Criptoativos" C
+10 17 1 "P∆o com mortadela" m
+10 18 2 "Presunto" P
+11 19 1 "Suco de lim∆o" l

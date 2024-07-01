@@ -6,7 +6,7 @@
 # include <stdlib.h> /*atoi(), malloc(), free()*/
 # include <string.h> /*strchr(), strcpy(), strlen(), strtok() */
 # include "console_v1.5.5.h" /*Evento(), hit(), setCursorStatus()*/
-# include "conio_v3.2.4.h" /*gotoxy(), texbackground(), texcolor(), wherexy()*/
+# include "conio_v3.2.4.h" /*gotoxy(), puttext(), texbackground(), texcolor(), wherexy(), _gettext()*/
 # include "funcoes.h" /*Abre_arquivos_e_aloca_memoria(), Contagem_menus_submenus(), Desenha_Janela_Principal(), Desenha_Janela_submenus(),
 Exibe_menu_principal(), Exibe_submenus(), Inicializa_estrutura_cores(), Inicializa_estruturas_menus(), Inicializa_variaveis_diversas(), Menu(), Ordena_menus()*/
 
@@ -173,9 +173,8 @@ void Abre_arquivos_e_aloca_memoria(char *arquivo_menus, char *arquivo_cores, ARQ
     /*Se caso os dois arquivos, seus retornos sao diferente de NULL, significa que foram abertos corretamente*/
     if(arq_config != NULL && arq_menus != NULL)
     {
-        /*Aloco espaco para minha Tela de salvamento apos os arquivos serem abertos corretamente*/
+        /*Pego o tamanho maximo da janela*/
         arquivos->limite_maximo_da_janela = MaxDimensaoJanela();
-
 
         /*Chamo a funcao para inicializar as estruturas*/
         Inicializa_estruturas_menus(menus, arquivos, &menu_config);
@@ -690,7 +689,7 @@ int Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, i
     /*Variavel que recebera o indice atual da selecao de um submenu, inicia com -1 pois nao foi selecionado nenhuma opcao*/
     int selecao_submenu = -1;
 
-    /*char caractere_atalho;*/
+    /*Variaveis para encontrar a posicao da letra de atalho das opcoes*/
     char *posicao_atalho;
     int indice_letra_atalho;
 
@@ -906,14 +905,6 @@ int Exibe_submenus(MENU **menus, MENU_CONFIG *menu_config, ARQUIVOS *arquivos, i
                         }
                     }
                 }
-                else
-                {
-                    /*Verificacao do pressionamento do alt
-                    if(arquivos->eventos_submenus.teclado.status_teclas_controle & ALT_ESQUERDO)
-                    {
-                        
-                    }*/
-                }
             }
         }
         
@@ -1098,8 +1089,6 @@ int Menu(char *arquivo_menus, char *arquivo_cores)
 
     /*seta as cores originais do cmd*/
     setCursorStatus(LIGAR);
-    textcolor(LIGHTGRAY);
-    textbackground(BLACK);
 
     /*Retorna o ultimo id selecionado para impressao na main*/
     return arquivos.retorno;

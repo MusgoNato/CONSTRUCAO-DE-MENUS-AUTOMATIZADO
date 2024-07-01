@@ -4,7 +4,7 @@
 # define TAM_OPCAO_MENU 30
 # define TAM_BUFFER 100
 # define TAM_LINHA_CONFIG 100
-# define TAM_VETOR_MENU_CONFIG 20 
+# define TAM_VETOR_MENU_CONFIG 30 
 # define TAM_VETOR_AUX_TOKENIZACAO 19
 # define ESPACAMENTO_INICIO_FINAL_OPCAO 2
 # define ALT_ESQUERDO LEFT_ALT_PRESSED
@@ -148,9 +148,10 @@ typedef struct config
 }MENU_CONFIG;
 
 
-/*Funcao responsavel por ler os arquivos passados para realizar a verificacao se foram abertos e lidos de modo correto
+/*Funcao responsavel por ler os arquivos passados para realizar a verificacao se foram abertos e lidos de modo correto, caso forem lidos corretamente as
+informacoes dentro do arquivo sera passado para uma matriz, onde esta contera as linhas do arquivo, essa etapa ocorre para os dois arquivos.
 Parametros:
-1 -> Um tipo char *, este paramentro sera a string passada como primeiro argumento para meu programa, sendo o arquivo .txt contendo os menus 
+1 -> Um tipo char *, este paramentro sera a string passada como primeiro argumento para meu programa, sendo o arquivo .txt contendo os menus .
 2 -> Um tipo char *, este parametro sera o nome do arquivo .txt para configuracao de exibicao dos menus (cores, espacamento, altura, largura, etc).
 3 -> Um tipo ponteiro para estrutura, este parametro armazena meus arquivos abertos para que eu possa trata-los e guarda-los em matrizes ou vetores.
 Retorno : Nenhum
@@ -162,7 +163,7 @@ Parametros:
 1 -> Um ponteiro para ponteiro, para uma estrutura, este parametro eh um vetor de estruturas,
 a estrutura em si conta com cada identificador do menu, o identificador pai, sua ordem, seu nome e letra de atalho presente.  
 2 -> Um ponteiro para estrutura arquivos, a estrutura arquivos contem variaveis que servirao se contagem para submenus e menus principais,
-pois preciso desses valores em outras funcoes usadas no decorrer do programa
+pois preciso desses valores em outras funcoes usadas no decorrer do programa.
 Retorno : Nenhum
 */
 void Contagem_menus_submenus(MENU **, ARQUIVOS *);
@@ -170,18 +171,18 @@ void Contagem_menus_submenus(MENU **, ARQUIVOS *);
 /*Funcao responsavel por desenhar a janela principal dos menus
 Parametros:
 1 -> Um ponteiro para estrutura MENU_CONFIG, como somente sera uma linha no arquivo contendo as configuracoes dos menus, somente foi necessario criar uma estrutura
-contendo todos os valores e assim inicializa-los, nesta funcao ela eh usada para desenhar a janela principal, pois ela contem as configuracoes do menu
-2 -> Um tipo int, na funcao 'Exibe_menu_Principal' eh contado quantos menus foram impressos a partir do id pai, com isso eh passado para esta funcao para saber ate onde deve-se desenhar a janela
+contendo todos os valores e assim inicializa-los, nesta funcao ela eh usada para desenhar a janela principal, pois ela contem as configuracoes do menu.
+2 -> Um tipo int, na funcao 'Exibe_menu_Principal' eh contado quantos menus foram impressos a partir do id pai, com isso eh passado para esta funcao para saber ate onde deve-se desenhar a janela.
 Retorno : Nenhum
 */
 void Desenha_Janela_Principal(MENU_CONFIG *, int );
 
 /*Funcao responsavel por desenhar a janela dos submenus
 Parametros:
-1 -> Um ponteiro para estrutura MENU_CONFIG, na funcao eh passado este parametro justamento para desenhar as janelas dos submenus, assim como a funcao Desenha_Janela_Principal
+1 -> Um ponteiro para estrutura MENU_CONFIG, na funcao eh passado este parametro justamento para desenhar as janelas dos submenus, assim como a funcao Desenha_Janela_Principal().
 2 -> Um ponteiro para estrutura ARQUIVOS, a estrutura arquivos contem as coordenadas de onde a janela deve ser impressa.
 3 -> Um tipo int, representa a quantidade de submenus que foram contados na funcao 'Exibe_submenus'.
-4 -> Um tipo int, representa a largura da janela do submenu a ser impressa, para desenhar e caber a maior opcao dos menus, essa variavel serve para desenhar a janela referente a maior opcao
+4 -> Um tipo int, representa a largura da janela do submenu a ser impressa, para desenhar e caber a maior opcao dos menus, essa variavel serve para desenhar a janela referente a maior opcao.
 Retorno : Nenhum*/
 void Desenha_Janela_submenus(MENU_CONFIG *, ARQUIVOS *, int, int);
 

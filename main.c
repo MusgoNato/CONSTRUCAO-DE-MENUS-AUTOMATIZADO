@@ -6,7 +6,12 @@ abertos, exibidos na vertical abaixo do menu pai principal. O usuario podera pre
 as letras de atalho coloridas em cada opcao de acordo com a cor no arquivo passado como segundo parametro para a funcao, serao letras de atalho onde o usuario podera pressionar a tecla
 ALT + 'letra de atalho de alguma opcao', assim o usuario entrara em algum submenu atraves de atalhos caso haja algum.
 
-NOTA : O programa suporta a opcao ate no maximo 30 caracteres, caso adicione uma opcao com mais de 30 caracteres nao funcionara corretamente*
+NOTA :
+1. O programa suporta a opcao ate no maximo 30 caracteres dentro das aspas duplas,
+caso adicione uma opcao com mais de 30 caracteres nao funcionara corretamente.
+2. Caso no arquivo .txt haja menus comecando na ordem acima de 1, o programa nao funcionara.
+3. Caso o arquivo .txt haja letras de atalhos nao encontradas na opcao escrita dentro do ", o programa nao funcionara.
+
 
 Programador: Hugo Josue Lema Das Neves
 RGM: 47159 
