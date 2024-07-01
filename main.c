@@ -9,8 +9,8 @@ ALT + 'letra de atalho de alguma opcao', assim o usuario entrara em algum submen
 NOTA :
 1. O programa suporta a opcao ate no maximo 30 caracteres dentro das aspas duplas,
 caso adicione uma opcao com mais de 30 caracteres nao funcionara corretamente.
-2. Caso no arquivo .txt haja menus comecando na ordem acima de 1, o programa nao funcionara.
-3. Caso o arquivo .txt haja letras de atalhos nao encontradas na opcao escrita dentro do ", o programa nao funcionara.
+2. Caso no arquivo .txt haja menus comecando na ordem acima de 1, o programa nao funcionara corretamente.
+3. Caso o arquivo .txt haja letras de atalhos nao encontradas na opcao escrita dentro do ", o programa nao funcionara corretamente.
 
 
 Programador: Hugo Josue Lema Das Neves
