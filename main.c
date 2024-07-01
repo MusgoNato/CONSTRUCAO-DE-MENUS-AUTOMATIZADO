@@ -15,7 +15,7 @@ caso adicione uma opcao com mais de 30 caracteres nao funcionara corretamente.
 
 Programador: Hugo Josue Lema Das Neves
 RGM: 47159 
-Data da Ultima modificacao: 29/06/2024*/
+Data da Ultima modificacao: 01/07/2024*/
 
 /*Copiar e colar no prompt de comando, apertar ENTER para executar
 gcc main.c -o main.exe console_v1.5.5.c conio_v3.2.4.c menu.c -Wall -pedantic -Wextra -Werror
