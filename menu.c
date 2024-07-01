@@ -3,7 +3,7 @@
 /*Inclusao de bibliotecas*/
 # include <ctype.h> /*isdigit()*/
 # include <stdio.h> /*fclose(), fgetc(), fgets(), fopen(), fseek(), printf() putchar()*/
-# include <stdlib.h> /*atoi(), malloc(), free()*/
+# include <stdlib.h> /*atoi(), free(), malloc()*/
 # include <string.h> /*strchr(), strcpy(), strlen(), strtok() */
 # include "console_v1.5.5.h" /*Evento(), hit(), setCursorStatus()*/
 # include "conio_v3.2.4.h" /*gotoxy(), puttext(), texbackground(), texcolor(), wherexy(), _gettext()*/
