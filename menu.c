@@ -200,15 +200,6 @@ void Contagem_menus_submenus(MENU **menus, ARQUIVOS *arquivos)
         }
     }
 
-    /*Alocacao da minha tela de save para o menu principal*/
-    arquivos->Tela_menu_principal = (char *)malloc(arquivos->limite_maximo_da_janela.X * arquivos->limite_maximo_da_janela.Y * 2 * sizeof(char));
-
-    /*Liberacao de memoria caso de errado a alocacao*/
-    if(arquivos->Tela_menu_principal == NULL)
-    {
-        free(arquivos->Tela_menu_principal);
-    }
-
     /*Aloca minha tela de save da janela do cmd*/
     arquivos->Tela = (char **)malloc(arquivos->cont_submenus * sizeof(char *));
     

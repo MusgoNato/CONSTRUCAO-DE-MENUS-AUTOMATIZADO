@@ -78,7 +78,6 @@ typedef struct arquivos
     VETOR_IDS_COOR_SUBS **vetor_ids_coord_sub;
     int index_vetor;
     int retorno;
-    char *Tela_menu_principal;
 
 }ARQUIVOS;
 
